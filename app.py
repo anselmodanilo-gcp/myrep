@@ -10,124 +10,98 @@ import random
 # CONFIGURAÇÃO DA PÁGINA
 # ==============================================================================
 st.set_page_config(
-    page_title="Luminar Saúde | QG da Demo & Copiloto IA de CPAP",
+    page_title="Luminar Saúde | Gerenciador da Demo & Hub de Dados para Gemini Enterprise",
     page_icon="🫁",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # ==============================================================================
-# DESIGN SYSTEM & ESTILIZAÇÃO CSS AVANÇADA
+# DESIGN SYSTEM COM ALTA LEGIBILIDADE E CONTRASTE
 # ==============================================================================
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
     html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #0F172A;
     }
     
     .main-header {
-        font-size: 26px;
+        font-size: 24px;
         font-weight: 800;
-        color: #0A3D62;
+        color: #0F172A;
         letter-spacing: -0.5px;
-        margin-bottom: 2px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        margin-bottom: 4px;
     }
     .sub-header {
-        font-size: 14px;
-        color: #4A6572;
-        margin-bottom: 20px;
+        font-size: 15px;
+        color: #334155;
+        margin-bottom: 24px;
         font-weight: 400;
+        line-height: 1.5;
     }
-    .metric-card {
-        background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
-        border: 1px solid #E2E8F0;
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-        transition: all 0.2s ease;
+    .card-container {
+        background-color: #FFFFFF;
+        border: 1px solid #CBD5E1;
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .metric-card:hover {
-        box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-        border-color: #CBD5E1;
-    }
-    .scenario-box {
-        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-        border: 1px solid #BAE6FD;
+    .prompt-box {
+        background-color: #F1F5F9;
+        border: 1px solid #94A3B8;
         border-left: 5px solid #0284C7;
-        border-radius: 8px;
+        border-radius: 6px;
         padding: 14px 18px;
-        margin-bottom: 12px;
+        margin: 12px 0;
+        font-family: 'Inter', sans-serif;
+        color: #0F172A;
+        font-size: 14.5px;
+        line-height: 1.6;
+    }
+    .scenario-card {
+        background-color: #FFFFFF;
+        border: 1px solid #CBD5E1;
+        border-left: 5px solid #0369A1;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 14px;
     }
     .scenario-title {
         font-weight: 700;
         color: #0369A1;
         font-size: 16px;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
     }
-    .product-card {
-        border-left: 4px solid #0284C7;
-        background-color: #F8FAFC;
-        padding: 14px;
-        border-radius: 0 10px 10px 0;
-        margin-bottom: 12px;
-        border: 1px solid #E2E8F0;
-        border-left-width: 5px;
+    .gemini-badge {
+        background-color: #E0E7FF;
+        color: #3730A3;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        display: inline-block;
+        margin-bottom: 8px;
     }
-    .gmail-box {
-        background-color: #FFFFFF;
-        border: 1px solid #E0E0E0;
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 12px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    }
-    .gmail-sender {
-        font-weight: bold;
-        color: #202124;
-    }
-    .gmail-subject {
-        color: #1A73E8;
-        font-size: 15px;
+    .source-badge {
+        background-color: #E2E8F0;
+        color: #1E293B;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
         font-weight: 600;
-    }
-    .badge-urgent {
-        background-color: #FEE2E2;
-        color: #991B1B;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-    .badge-high {
-        background-color: #FEF3C7;
-        color: #92400E;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-    .badge-medium {
-        background-color: #E0F2FE;
-        color: #075985;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 700;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# CARGA E GESTÃO DE ESTADO DE DADOS
+# CARGA E GESTÃO DE DADOS
 # ==============================================================================
 BASE_DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(BASE_DIR, "bigquery", "data")
-WORKSPACE_DIR = os.path.join(BASE_DIR, "workspace")
 STORAGE_DIR = os.path.join(BASE_DIR, "storage")
 
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -148,7 +122,6 @@ def load_data():
     return df_leads, df_cat, df_rec, df_hist
 
 def reset_demo_data():
-    """Restaura a base de demonstração para o estado original."""
     try:
         import subprocess
         subprocess.run(["python3", "generate_assets.py"], check=True)
@@ -162,420 +135,398 @@ def reset_demo_data():
 df_leads, df_catalogo, df_rec, df_hist = load_data()
 
 # ==============================================================================
-# MENU LATERAL & GERENCIADOR DA DEMO
+# MENU LATERAL - CENTRO DE CONTROLE DA DEMO
 # ==============================================================================
-st.sidebar.image("https://img.icons8.com/color/96/lungs.png", width=55)
-st.sidebar.title("Luminar Saúde")
-st.sidebar.markdown("**Centro de Comando & QG da Demo**")
-st.sidebar.caption("Google Cloud Project: `abiding-arch-505313-m3`")
+st.sidebar.image("https://img.icons8.com/color/96/lungs.png", width=50)
+st.sidebar.markdown("### **Luminar Saúde**")
+st.sidebar.markdown("**Gerenciador da Demo & Hub de Dados**")
+st.sidebar.caption("Fonte de Dados para: **Gemini Enterprise**")
 
 menu = st.sidebar.radio(
-    "Módulos de Navegação:",
+    "Navegação do Gerenciador:",
     [
-        "🎮 0. QG da Demo & Roteiro Interativo",
-        "🪄 1. Gerador Avançado de Dados & Contexto",
-        "🩺 2. Cockpit Comercial & Qualificação",
-        "🎯 3. Copiloto de Recomendação (CPAP/Máscaras)",
-        "🤖 4. Agent Platform & MCP Playground",
-        "✉️ 5. Simulador Workspace (Gmail & Drive)",
-        "🔄 6. Recorrência & LTV (Insumos)",
-        "☁️ 7. Google Cloud Architecture"
+        "🧭 1. Roteiro da Demo & Prompts do Gemini Enterprise",
+        "🪄 2. Gerador de Dados Sintéticos & Injeção ao Vivo",
+        "📊 3. Inspeção de Fontes de Dados (BigQuery & Storage)",
+        "⚙️ 4. Conexões do Gemini Enterprise & Reset da Base"
     ]
 )
 
 st.sidebar.markdown("---")
-with st.sidebar.expander("⚙️ Controle da Demonstração"):
-    if st.button("🔄 Resetar Base da Demo (Padrão)", use_container_width=True):
-        if reset_demo_data():
-            st.success("Base restaurada com sucesso!")
-            st.rerun()
-    st.caption("Restaura os 5 pacientes padrão e limpa simulações extras.")
+st.sidebar.markdown("#### 🔄 Ações Rápidas")
+if st.sidebar.button("Restaurar Base Padrão da Demo", use_container_width=True):
+    if reset_demo_data():
+        st.sidebar.success("Base restaurada com sucesso!")
+        st.rerun()
 
-st.sidebar.info("""
-**Status da Infraestrutura:**
-- 🟢 **Cloud Run:** Ativo (Porta 8080)
-- 🟢 **MCP Server:** `/mcp/manifest.json`
-- 🟢 **BigQuery:** `luminar_saude`
-- 🟢 **Cloud Storage:** Ativo
-- 🟢 **Vertex AI Agent:** Ativo
-""")
+st.sidebar.markdown("---")
+st.sidebar.markdown("""
+<div style="font-size:12.5px; color:#334155; line-height:1.5;">
+<b>Arquitetura da Demo:</b><br/>
+• <b>Gerenciador (Cloud Run):</b> Gera dados e controla cenários.<br/>
+• <b>Ponto de Acesso do Usuário:</b> Gemini Enterprise (Chat com dados, busca em PDFs e tools MCP).
+</div>
+""", unsafe_allow_html=True)
 
 # ==============================================================================
-# MENU 0: QG DA DEMO & ROTEIRO INTERATIVO
+# MENU 1: ROTEIRO DA DEMO & PROMPTS DO GEMINI ENTERPRISE
 # ==============================================================================
-if "0. QG da Demo" in menu:
-    st.markdown('<div class="main-header">🎮 Centro de Comando & Roteiro da Demonstração</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Guia interativo passo a passo com falas sugeridas, pontos de clique e acionamento de cenários</div>', unsafe_allow_html=True)
+if "1. Roteiro" in menu:
+    st.markdown('<div class="main-header">🧭 Roteiro da Demonstração & Prompts para o Gemini Enterprise</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Utilize este roteiro durante a apresentação. O <b>Gemini Enterprise</b> é o ponto de acesso único onde você fará as perguntas, consultará os laudos em PDF e obterá as recomendações de CPAP.</div>', unsafe_allow_html=True)
     
-    # Cards de Métricas Gerais da Demo
-    m1, m2, m3, m4 = st.columns(4)
-    with m1:
-        st.metric("Total de Pacientes no CRM", len(df_leads), "+ Pronto para Apresentação")
-    with m2:
-        urgentes = len(df_leads[df_leads['urgencia_comercial'].isin(['URGENTE', 'ALTA'])]) if not df_leads.empty else 0
-        pct = int(urgentes/len(df_leads)*100) if len(df_leads) > 0 else 0
-        st.metric("Casos de Alta Gravidade", f"{urgentes} leads", f"{pct}% da carteira")
-    with m3:
-        st.metric("Produtos no Catálogo", len(df_catalogo) if not df_catalogo.empty else 12, "CPAP, BiPAP, Máscaras")
-    with m4:
-        st.metric("Tempo Médio de Atendimento", "2.5 min", "-78% com Gemini")
-        
+    col_a, col_b, col_c = st.columns(3)
+    with col_a:
+        st.markdown("""
+        <div class="card-container">
+            <span class="gemini-badge">Fonte BigQuery</span>
+            <div style="font-size:20px; font-weight:700; color:#0F172A;">""" + str(len(df_leads)) + """ Pacientes</div>
+            <div style="font-size:13px; color:#475569;">CRM e métricas clínicas no BigQuery</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_b:
+        laudos_count = len(glob.glob(os.path.join(STORAGE_DIR, "laudos_polissonografia", "*.*")))
+        st.markdown("""
+        <div class="card-container">
+            <span class="gemini-badge">Fonte Cloud Storage</span>
+            <div style="font-size:20px; font-weight:700; color:#0F172A;">""" + str(laudos_count) + """ Laudos & PDFs</div>
+            <div style="font-size:13px; color:#475569;">Polissonografias e Prescrições Médicas</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_c:
+        st.markdown("""
+        <div class="card-container">
+            <span class="gemini-badge">Ferramentas MCP</span>
+            <div style="font-size:20px; font-weight:700; color:#0F172A;">4 Tools Ativas</div>
+            <div style="font-size:13px; color:#475569;">Matching, Pitch e Consulta Clínica</div>
+        </div>
+        """, unsafe_allow_html=True)
+
     st.markdown("---")
-    st.subheader("🧭 Roteiro Oficial da Apresentação (5 Atos)")
-    
+    st.markdown("### 🎬 Atos da Apresentação com Prompts do Gemini Enterprise")
+
     # ATO 1
-    with st.expander("📍 **ATO 1: O Desafio do Negócio (1 a 2 min)** — O Vendedor & A Complexidade Médica", expanded=True):
+    with st.expander("📍 **ATO 1: O Desafio Comercial & Consulta ao Gemini Enterprise (2 min)**", expanded=True):
         st.markdown("""
-        <div class="scenario-box">
-            <div class="scenario-title">🎯 Objetivo: Conectar o público com o problema real de vendas de saúde</div>
-            <p><b>Narrativa do Apresentador:</b><br/>
-            <i>"Na medicina respiratória e do sono, o consultor não vende apenas um produto, ele vende uma terapia médica. 
-            Quando um paciente chega com um laudo de polissonografia, há termos complexos: IAH, saturação de oxigênio mínima, pressão em cmH2O. 
-            Traduzir isso no equipamento ideal, na máscara correta e quebrar o medo de claustrofobia demorava dias. 
-            Com o Copiloto de IA da Luminar Saúde, o vendedor fecha em minutos com total segurança médica."</i></p>
+        <div class="scenario-card">
+            <div class="scenario-title">1. Contexto & Consulta Geral de Leads</div>
+            <p><b>Objetivo:</b> Mostrar como o vendedor consulta o Gemini Enterprise para entender quem são os pacientes que precisam de atendimento prioritário hoje.</p>
+            <p><b>Prompt para copiar e colar no Gemini Enterprise:</b></p>
+            <div class="prompt-box">
+            <b>"Quais são os pacientes com apneia do sono grave na nossa base do BigQuery que exigem contato imediato da equipe de vendas? Apresente o IAH, saturação mínima e médico prescritor de cada um."</b>
+            </div>
+            <p><b>O que o Gemini Enterprise fará:</b> Consultará o BigQuery <code>luminar_saude.leads_pacientes</code> e listará os pacientes com IAH &gt;= 30 (como Roberto Silveira Santos e Carlos Eduardo Paes).</p>
         </div>
         """, unsafe_allow_html=True)
-        st.info("💡 **Ação recomendada:** Explique o contexto antes de mudar de tela ou avance para o Cockpit.")
-        
+
     # ATO 2
-    with st.expander("📍 **ATO 2: Cockpit Comercial & Laudos Multimodais (3 min)** — Visão Geral & Extração de PDF", expanded=True):
+    with st.expander("📍 **ATO 2: Extração Multimodal do Laudo de Polissonografia (3 min)**", expanded=True):
         st.markdown("""
-        <div class="scenario-box">
-            <div class="scenario-title">🎯 O que mostrar: Triagem instantânea e leitura multimodal de PDF no Cloud Storage</div>
-            <ul>
-                <li><b>Onde clicar:</b> Menu Lateral 👉 <code>2. Cockpit Comercial & Qualificação</code></li>
-                <li><b>Paciente Destaque:</b> Selecione <b>Roberto Silveira Santos</b> (IAH 38.4, Apneia Grave, Respirador Bucal).</li>
-                <li><b>O que enfatizar:</b> O laudo em PDF foi lido diretamente do Cloud Storage e os parâmetros clínicos foram estruturados no BigQuery sem digitação humana.</li>
-            </ul>
+        <div class="scenario-card">
+            <div class="scenario-title">2. Busca de Conhecimento Não Estruturado (PDFs no Cloud Storage)</div>
+            <p><b>Objetivo:</b> Demonstrar o Gemini Enterprise lendo o laudo médico original em PDF armazenado no Cloud Storage e traduzindo termos médicos complexos.</p>
+            <p><b>Prompt para copiar e colar no Gemini Enterprise:</b></p>
+            <div class="prompt-box">
+            <b>"Abra o laudo polissonográfico do paciente Roberto Silveira Santos no Cloud Storage e resuma: qual foi a pressão titulada recomendada pelo Dr. Fernando Albuquerque e qual é o padrão respiratório dele?"</b>
+            </div>
+            <p><b>Resposta esperada do Gemini:</b> Identificará pressão de 12.0 cmH2O, IAH de 38.4 eventos/hora e respiração bucal/mista.</p>
         </div>
         """, unsafe_allow_html=True)
-        st.markdown("<b>Mensagem de Impacto:</b> *'O Gemini estruturou o laudo médico em milissegundos, alertando o risco de saúde e a urgência comercial.'*")
-        
+
     # ATO 3
-    with st.expander("📍 **ATO 3: Matching Clínico & Quebra de Objeções (3 min)** — O Copiloto de Vendas", expanded=True):
+    with st.expander("📍 **ATO 3: Matching Inteligente de CPAP, Máscara e Quebra de Objeções (3 min)**", expanded=True):
         st.markdown("""
-        <div class="scenario-box">
-            <div class="scenario-title">🎯 O que mostrar: O pacote inteligente, o racional médico e os scripts comerciais</div>
-            <ul>
-                <li><b>Onde clicar:</b> Menu Lateral 👉 <code>3. Copiloto de Recomendação (CPAP/Máscaras)</code></li>
-                <li><b>Pontos-chave:</b>
-                    <ol>
-                        <li><b>Equipamento:</b> ResMed AirSense 11 AutoSet (com alívio expiratório).</li>
-                        <li><b>Máscara:</b> ResMed AirFit F20 Facial (indispensável para quem respira pela boca e tem pressão de 12 cmH2O).</li>
-                        <li><b>Cross-Sell:</b> Tubo aquecido ClimateLineAir para evitar ressecamento.</li>
-                        <li><b>Quebra de Objeções:</b> Argumento pronto do programa <i>'Luminar Adaptação 30 Dias'</i>.</li>
-                    </ol>
-                </li>
-            </ul>
+        <div class="scenario-card">
+            <div class="scenario-title">3. Recomendação de Produtos com Ferramentas MCP & Proposta Comercial</div>
+            <p><b>Objetivo:</b> Mostrar a IA recomendando o combo completo de produtos (equipamento + máscara correta + tubo aquecido) e redigindo a mensagem comercial.</p>
+            <p><b>Prompt para copiar e colar no Gemini Enterprise:</b></p>
+            <div class="prompt-box">
+            <b>"Com base no laudo e na respiração bucal do Roberto Silveira, qual modelo de CPAP e qual máscara do nosso catálogo devo ofertar? Gere também uma proposta comercial com quebra de objeções sobre adaptação para envio via WhatsApp."</b>
+            </div>
+            <p><b>Resposta esperada do Gemini:</b>
+            <br/>• Equipamento: <i>ResMed AirSense 11 AutoSet</i>
+            <br/>• Máscara: <i>ResMed AirFit F20 Facial</i> (obrigatória para quem respira pela boca e tem pressão &gt;= 12 cmH2O)
+            <br/>• Argumento: Destaque do programa <i>'Luminar Adaptação 30 Dias'</i> (troca grátis de modelo de máscara caso sinta desconforto).
+            </p>
         </div>
         """, unsafe_allow_html=True)
-        st.markdown("<b>Mensagem de Impacto:</b> *'Zero erro de compatibilidade de produtos e aumento imediato do ticket médio com cross-sell.'*")
-        
+
     # ATO 4
-    with st.expander("📍 **ATO 4: Injeção de Dados em Tempo Real (Live Lead Simulator) (3 min)**", expanded=True):
+    with st.expander("📍 **ATO 4: Injeção de Novo Lead ao Vivo & Reação do Gemini (3 min)**", expanded=True):
         st.markdown("""
-        <div class="scenario-box">
-            <div class="scenario-title">🎯 O que mostrar: A IA reagindo instantaneamente a novos clientes ao vivo</div>
-            <ul>
-                <li><b>Onde clicar:</b> Menu Lateral 👉 <code>1. Gerador Avançado de Dados & Contexto</code></li>
-                <li><b>Ação ao vivo:</b> Clique em um dos botões de 1-Clique (ex: <i>'🤧 Paciente Rinite & Claustrofobia'</i> ou <i>'✈️ Executivo Viagem'</i>).</li>
-                <li><b>Retorno:</b> Volte ao Cockpit e mostre que a paciente foi qualificada e a IA montou a recomendação da Máscara P10 de 45g na hora!</li>
-            </ul>
+        <div class="scenario-card">
+            <div class="scenario-title">4. Injeção de Dados em Tempo Real pelo Gerenciador</div>
+            <p><b>Objetivo:</b> Mostrar a agilidade do ecossistema: um novo lead é gerado aqui no menu <b>2. Gerador de Dados</b> e imediatamente o Gemini Enterprise já sabe tudo sobre ele.</p>
+            <p><b>Ação do Apresentador:</b>
+            <br/>1. Vá ao menu <b>2. Gerador de Dados Sintéticos</b> e clique em <i>'Injetar Cenário: Juliana Silveira (Rinite & Claustrofobia)'</i>.
+            <br/>2. Volte ao Gemini Enterprise e execute o prompt abaixo:
+            </p>
+            <div class="prompt-box">
+            <b>"A paciente Juliana Silveira acabou de ser cadastrada. Ela tem rinite alérgica crônica e queixa de claustrofobia com máscaras faciais grandes. O que você recomenda para o caso dela?"</b>
+            </div>
+            <p><b>Resposta esperada do Gemini:</b> Recomendação da <i>Máscara de Almofadas Nasais AirFit P10 (45g)</i> ultraleve com filtros hipoalergênicos.</p>
         </div>
         """, unsafe_allow_html=True)
-        st.markdown("<b>Mensagem de Impacto:</b> *'Qualquer nova receita que entra por WhatsApp ou formulário web é qualificada e encaminhada em tempo real.'*")
-        
+
     # ATO 5
-    with st.expander("📍 **ATO 5: Vertex AI Agent Platform & Recorrência LTV (3 min)**", expanded=True):
+    with st.expander("📍 **ATO 5: Recorrência & Gestão do Ciclo de Vida (LTV) (2 min)**", expanded=True):
         st.markdown("""
-        <div class="scenario-box">
-            <div class="scenario-title">🎯 O que mostrar: O ecossistema de Agentes com MCP Tools e receita recorrente</div>
-            <ul>
-                <li><b>Onde clicar:</b> Menu Lateral 👉 <code>4. Agent Platform & MCP Playground</code> e <code>6. Recorrência & LTV</code></li>
-                <li><b>Teste no Agent:</b> Faça a pergunta sobre CPAP vs BiPAP para o paciente Carlos Eduardo (pressão 15 cmH2O).</li>
-                <li><b>LTV:</b> Mostre como o sistema detecta almofadas de silicone com mais de 6 meses e envia lembrete proativo de troca.</li>
-            </ul>
+        <div class="scenario-card">
+            <div class="scenario-title">5. Proatividade de Vendas em Insumos Recorrentes</div>
+            <p><b>Objetivo:</b> Mostrar o Gemini Enterprise analisando a tabela de histórico de compras para identificar oportunidades de reposição de almofadas e filtros.</p>
+            <p><b>Prompt para copiar e colar no Gemini Enterprise:</b></p>
+            <div class="prompt-box">
+            <b>"Consulte o histórico de compras no BigQuery e liste quais clientes estão usando a mesma almofada de máscara há mais de 180 dias. Redija um lembrete empático de saúde para enviar aos pacientes elegíveis para troca."</b>
+            </div>
+            <p><b>Resposta esperada do Gemini:</b> Identificará os clientes com alerta de troca e redigirá o lembrete focado em higiene, vedação e conforto.</p>
         </div>
         """, unsafe_allow_html=True)
-        st.markdown("<b>Mensagem de Impacto:</b> *'+35% de conversão de vendas, +22% de receita recorrente de insumos e ciclo comercial reduzido de semanas para minutos.'*")
 
 # ==============================================================================
-# MENU 1: GERADOR AVANÇADO DE DADOS & CONTEXTO (SYNTHETIC CONTEXT GENERATOR)
+# MENU 2: GERADOR DE DADOS SINTÉTICOS & INJEÇÃO AO VIVO
 # ==============================================================================
-elif "1. Gerador" in menu:
-    st.markdown('<div class="main-header">🪄 Gerador de Dados Sintéticos & Criador de Contextos</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Crie pacientes, laudos, histórico de compras, queixas e cenários contextuais sob medida para a demonstração</div>', unsafe_allow_html=True)
+elif "2. Gerador" in menu:
+    st.markdown('<div class="main-header">🪄 Gerador de Dados Sintéticos para Ingestão no Gemini Enterprise</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Crie dados estruturados (BigQuery) e não estruturados (PDFs/TXTs no Storage) para alimentar as consultas do <b>Gemini Enterprise</b> durante a demonstração.</div>', unsafe_allow_html=True)
     
-    tab_leads_gen, tab_custom_scenario, tab_hist_gen = st.tabs([
+    tab_rapida, tab_form_lead, tab_form_hist = st.tabs([
         "⚡ Injeção Rápida de Cenários (1-Clique)",
-        "📝 Gerador Completo de Lead & Contexto Clínico",
-        "🔄 Gerador de Histórico de Compras (LTV)"
+        "📝 Criador Customizado de Paciente, Laudo & Objeções",
+        "🔄 Injetor de Histórico de Compras (LTV)"
     ])
     
-    # ABA 1: CENÁRIOS RÁPIDOS 1-CLIQUE
-    with tab_leads_gen:
-        st.subheader("⚡ Injeção Instantânea de Cenários Pré-Configurados")
-        st.markdown("Clique em qualquer cenário abaixo para injetar o paciente no BigQuery e gerar seus laudos e recomendações na hora:")
+    with tab_rapida:
+        st.subheader("⚡ Cenários Pré-Configurados para Injeção Instantânea")
+        st.markdown("Ao clicar em qualquer botão, o paciente é gravado no BigQuery e seu laudo médico é gerado no Cloud Storage para busca do Gemini Enterprise:")
         
         c1, c2 = st.columns(2)
         
         with c1:
-            with st.container():
-                st.markdown("""
-                <div class="scenario-box">
-                    <div class="scenario-title">🚨 1. Apneia Crítica com Risco Cardiovascular</div>
-                    <b>Perfil:</b> Homem, 58 anos, obeso, pressão de titulação alta (14 cmH2O), respiração bucal.<br/>
-                    <b>Queixas:</b> Acorda sufocado, sonolência severa ao volante, pressão arterial descontrolada.<br/>
-                    <b>Indicação IA:</b> CPAP AutoSet + Máscara Facial F20 + Tubo Aquecido.
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button("🚀 Injetar Cenário: Apneia Crítica (Eduardo Brandão)", use_container_width=True):
-                    novo_id = f"LEAD-{1000 + len(df_leads) + 1}"
-                    novo_dict = {
-                        "lead_id": novo_id,
-                        "nome_paciente": "Eduardo Brandão Fontes",
-                        "idade": 58,
-                        "genero": "M",
-                        "telefone": "(11) 98111-2233",
-                        "email": "eduardo.fontes@email.com",
-                        "cidade": "São Paulo",
-                        "estado": "SP",
-                        "medico_prescritor": "Dr. Fernando Albuquerque",
-                        "crm_medico": "CRM-SP 142.890",
-                        "especialidade_medico": "Pneumologia",
-                        "convenio": "Bradesco Saúde",
-                        "diagnostico_cid": "G47.3 - Apneia Grave com Hipoxemia Severa",
-                        "iah": 42.8,
-                        "spo2_minima": 71.0,
-                        "spo2_media": 89.0,
-                        "pressao_titulada_cmh2o": 14.0,
-                        "respiracao_predominante": "Oral / Mista",
-                        "presenca_ronco": "Muito Alto / Frequente",
-                        "comorbidades": "Hipertensão Refratária, Obesidade Grau II",
-                        "sensibilidade_pressao": "Alta",
-                        "score_prioridade": 98,
-                        "urgencia_comercial": "URGENTE",
-                        "status_funil": "Qualificado - Lead Live Demo",
-                        "data_entrada": datetime.now().strftime("%Y-%m-%d")
-                    }
-                    df_leads = pd.concat([df_leads, pd.DataFrame([novo_dict])], ignore_index=True)
-                    df_leads.to_csv(os.path.join(DATA_DIR, "leads_pacientes.csv"), index=False)
-                    st.success(f"✅ Lead {novo_id} (Eduardo Brandão) cadastrado com sucesso! Veja no Cockpit.")
-                    st.rerun()
+            st.markdown("""
+            <div class="scenario-card">
+                <div class="scenario-title">🚨 1. Apneia Crítica com Hipoxemia Severa</div>
+                <b>Paciente:</b> Eduardo Brandão Fontes (58 anos, SP)<br/>
+                <b>Diagnóstico:</b> IAH 42.8 ev/h, SpO2 mínima 71%, Pressão 14 cmH2O, Respiração bucal.<br/>
+                <b>Contexto:</b> Risco cardiovascular iminente, sonolência diurna grave.
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("🚀 Injetar Paciente 1: Eduardo Brandão", use_container_width=True):
+                novo_id = f"LEAD-{1000 + len(df_leads) + 1}"
+                novo_dict = {
+                    "lead_id": novo_id,
+                    "nome_paciente": "Eduardo Brandão Fontes",
+                    "idade": 58,
+                    "genero": "M",
+                    "telefone": "(11) 98111-2233",
+                    "email": "eduardo.fontes@email.com",
+                    "cidade": "São Paulo",
+                    "estado": "SP",
+                    "medico_prescritor": "Dr. Fernando Albuquerque",
+                    "crm_medico": "CRM-SP 142.890",
+                    "especialidade_medico": "Pneumologia",
+                    "convenio": "Bradesco Saúde",
+                    "diagnostico_cid": "G47.3 - Apneia Grave com Hipoxemia Severa",
+                    "iah": 42.8,
+                    "spo2_minima": 71.0,
+                    "spo2_media": 89.0,
+                    "pressao_titulada_cmh2o": 14.0,
+                    "respiracao_predominante": "Oral / Mista",
+                    "presenca_ronco": "Muito Alto / Frequente",
+                    "comorbidades": "Hipertensão Refratária, Obesidade Grau II",
+                    "sensibilidade_pressao": "Alta",
+                    "score_prioridade": 98,
+                    "urgencia_comercial": "URGENTE",
+                    "status_funil": "Qualificado - Lead Live Demo",
+                    "data_entrada": datetime.now().strftime("%Y-%m-%d")
+                }
+                df_leads = pd.concat([df_leads, pd.DataFrame([novo_dict])], ignore_index=True)
+                df_leads.to_csv(os.path.join(DATA_DIR, "leads_pacientes.csv"), index=False)
+                
+                # Gera laudo em TXT no storage
+                laudo_p = os.path.join(STORAGE_DIR, "laudos_polissonografia", "laudo_psg_eduardo_fontes.txt")
+                with open(laudo_p, "w", encoding="utf-8") as f:
+                    f.write(f"CLÍNICA DE MEDICINA DO SONO - LAUDO DE POLISSONOGRAFIA\nPACIENTE: Eduardo Brandão Fontes\nIAH: 42.8 ev/h (GRAVE)\nSpO2 Mínima: 71%\nPressão Titulada: 14.0 cmH2O\nRespiração: Oral / Mista\nMédico: Dr. Fernando Albuquerque (CRM-SP 142.890)")
+                
+                st.success(f"✅ Paciente {novo_id} (Eduardo Brandão) injetado com sucesso! Já disponível para consultas no Gemini Enterprise.")
+                st.rerun()
 
-            with st.container():
-                st.markdown("""
-                <div class="scenario-box">
-                    <div class="scenario-title">✈️ 2. Executivo de Viagens (Busca CPAP Ultracompacto)</div>
-                    <b>Perfil:</b> Homem, 44 anos, viaja semanalmente, ronco em hotéis e cansaço diurno.<br/>
-                    <b>Dúvidas/Objeções:</b> <i>'Não posso carregar um aparelho pesado na mala de mão.'</i><br/>
-                    <b>Indicação IA:</b> ResMed AirMini Portátil + Máscara Nasal N30 + Bateria Externa.
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button("🚀 Injetar Cenário: Executivo Viagem (Marcelo Guimarães)", use_container_width=True):
-                    novo_id = f"LEAD-{1000 + len(df_leads) + 1}"
-                    novo_dict = {
-                        "lead_id": novo_id,
-                        "nome_paciente": "Marcelo Guimarães Dias",
-                        "idade": 44,
-                        "genero": "M",
-                        "telefone": "(11) 99333-4455",
-                        "email": "marcelo.guimaraes@empresa.com",
-                        "cidade": "São Paulo",
-                        "estado": "SP",
-                        "medico_prescritor": "Dr. Fernando Albuquerque",
-                        "crm_medico": "CRM-SP 142.890",
-                        "especialidade_medico": "Pneumologia",
-                        "convenio": "Amil One",
-                        "diagnostico_cid": "G47.3 - Apneia Leve-Moderada em Viagens",
-                        "iah": 14.5,
-                        "spo2_minima": 88.0,
-                        "spo2_media": 95.0,
-                        "pressao_titulada_cmh2o": 7.5,
-                        "respiracao_predominante": "Nasal",
-                        "presenca_ronco": "Moderado",
-                        "comorbidades": "Viagens semanais aéreas frequentes",
-                        "sensibilidade_pressao": "Baixa",
-                        "score_prioridade": 82,
-                        "urgencia_comercial": "MEDIA",
-                        "status_funil": "Qualificado - Lead Live Demo",
-                        "data_entrada": datetime.now().strftime("%Y-%m-%d")
-                    }
-                    df_leads = pd.concat([df_leads, pd.DataFrame([novo_dict])], ignore_index=True)
-                    df_leads.to_csv(os.path.join(DATA_DIR, "leads_pacientes.csv"), index=False)
-                    st.success(f"✅ Lead {novo_id} (Marcelo Guimarães) injetado com sucesso! Recomendado AirMini.")
-                    st.rerun()
+            st.markdown("""
+            <div class="scenario-card">
+                <div class="scenario-title">✈️ 2. Executivo de Viagens (Busca CPAP Portátil)</div>
+                <b>Paciente:</b> Marcelo Guimarães Dias (44 anos, SP)<br/>
+                <b>Diagnóstico:</b> IAH 14.5 ev/h, Pressão 7.5 cmH2O, Respiração Nasal.<br/>
+                <b>Objeção:</b> <i>'Preciso de um equipamento que caiba na minha mala de bordo.'</i>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("🚀 Injetar Paciente 2: Marcelo Guimarães", use_container_width=True):
+                novo_id = f"LEAD-{1000 + len(df_leads) + 1}"
+                novo_dict = {
+                    "lead_id": novo_id,
+                    "nome_paciente": "Marcelo Guimarães Dias",
+                    "idade": 44,
+                    "genero": "M",
+                    "telefone": "(11) 99333-4455",
+                    "email": "marcelo.guimaraes@empresa.com",
+                    "cidade": "São Paulo",
+                    "estado": "SP",
+                    "medico_prescritor": "Dr. Fernando Albuquerque",
+                    "crm_medico": "CRM-SP 142.890",
+                    "especialidade_medico": "Pneumologia",
+                    "convenio": "Amil One",
+                    "diagnostico_cid": "G47.3 - Apneia Leve-Moderada em Viagens",
+                    "iah": 14.5,
+                    "spo2_minima": 88.0,
+                    "spo2_media": 95.0,
+                    "pressao_titulada_cmh2o": 7.5,
+                    "respiracao_predominante": "Nasal",
+                    "presenca_ronco": "Moderado",
+                    "comorbidades": "Viagens aéreas semanais frequentes",
+                    "sensibilidade_pressao": "Baixa",
+                    "score_prioridade": 82,
+                    "urgencia_comercial": "MEDIA",
+                    "status_funil": "Qualificado - Lead Live Demo",
+                    "data_entrada": datetime.now().strftime("%Y-%m-%d")
+                }
+                df_leads = pd.concat([df_leads, pd.DataFrame([novo_dict])], ignore_index=True)
+                df_leads.to_csv(os.path.join(DATA_DIR, "leads_pacientes.csv"), index=False)
+                st.success(f"✅ Paciente {novo_id} (Marcelo Guimarães) injetado com sucesso! Já disponível no Gemini Enterprise.")
+                st.rerun()
 
         with c2:
-            with st.container():
-                st.markdown("""
-                <div class="scenario-box">
-                    <div class="scenario-title">🤧 3. Rinite Alérgica & Pânico de Claustrofobia</div>
-                    <b>Perfil:</b> Mulher, 39 anos, respiração nasal, queixa de sufocamento com máscaras grandes.<br/>
-                    <b>Dúvidas/Objeções:</b> <i>'Tenho aflição de colocar algo cobrindo todo o meu rosto.'</i><br/>
-                    <b>Indicação IA:</b> Máscara de Almofadas Nasais AirFit P10 (45g) + Filtros Hipoalergênicos.
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button("🚀 Injetar Cenário: Rinite & Claustrofobia (Juliana Silveira)", use_container_width=True):
-                    novo_id = f"LEAD-{1000 + len(df_leads) + 1}"
-                    novo_dict = {
-                        "lead_id": novo_id,
-                        "nome_paciente": "Juliana Silveira Nogueira",
-                        "idade": 39,
-                        "genero": "F",
-                        "telefone": "(11) 97222-3344",
-                        "email": "juliana.nogueira@email.com",
-                        "cidade": "Campinas",
-                        "estado": "SP",
-                        "medico_prescritor": "Dra. Beatriz Mendes",
-                        "crm_medico": "CRM-SP 178.432",
-                        "especialidade_medico": "Otorrinolaringologia",
-                        "convenio": "SulAmérica",
-                        "diagnostico_cid": "G47.3 - Apneia Moderada com Rinite",
-                        "iah": 19.4,
-                        "spo2_minima": 85.0,
-                        "spo2_media": 94.0,
-                        "pressao_titulada_cmh2o": 8.0,
-                        "respiracao_predominante": "Nasal",
-                        "presenca_ronco": "Moderado",
-                        "comorbidades": "Rinite Alérgica Crônica, Claustrofobia com Máscaras Faciais",
-                        "sensibilidade_pressao": "Média",
-                        "score_prioridade": 86,
-                        "urgencia_comercial": "ALTA",
-                        "status_funil": "Qualificado - Lead Live Demo",
-                        "data_entrada": datetime.now().strftime("%Y-%m-%d")
-                    }
-                    df_leads = pd.concat([df_leads, pd.DataFrame([novo_dict])], ignore_index=True)
-                    df_leads.to_csv(os.path.join(DATA_DIR, "leads_pacientes.csv"), index=False)
-                    st.success(f"✅ Lead {novo_id} (Juliana Silveira) injetada com sucesso! Recomendado AirFit P10.")
-                    st.rerun()
+            st.markdown("""
+            <div class="scenario-card">
+                <div class="scenario-title">🤧 3. Rinite Alérgica & Pânico de Claustrofobia</div>
+                <b>Paciente:</b> Juliana Silveira Nogueira (39 anos, Campinas/SP)<br/>
+                <b>Diagnóstico:</b> IAH 19.4 ev/h, SpO2 85%, Pressão 8.0 cmH2O, Respiração Nasal.<br/>
+                <b>Objeção:</b> <i>'Tenho pânico de máscara fechada no rosto.'</i>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("🚀 Injetar Paciente 3: Juliana Silveira", use_container_width=True):
+                novo_id = f"LEAD-{1000 + len(df_leads) + 1}"
+                novo_dict = {
+                    "lead_id": novo_id,
+                    "nome_paciente": "Juliana Silveira Nogueira",
+                    "idade": 39,
+                    "genero": "F",
+                    "telefone": "(11) 97222-3344",
+                    "email": "juliana.nogueira@email.com",
+                    "cidade": "Campinas",
+                    "estado": "SP",
+                    "medico_prescritor": "Dra. Beatriz Mendes",
+                    "crm_medico": "CRM-SP 178.432",
+                    "especialidade_medico": "Otorrinolaringologia",
+                    "convenio": "SulAmérica",
+                    "diagnostico_cid": "G47.3 - Apneia Moderada com Rinite",
+                    "iah": 19.4,
+                    "spo2_minima": 85.0,
+                    "spo2_media": 94.0,
+                    "pressao_titulada_cmh2o": 8.0,
+                    "respiracao_predominante": "Nasal",
+                    "presenca_ronco": "Moderado",
+                    "comorbidades": "Rinite Alérgica Crônica, Claustrofobia com Máscaras Faciais",
+                    "sensibilidade_pressao": "Média",
+                    "score_prioridade": 86,
+                    "urgencia_comercial": "ALTA",
+                    "status_funil": "Qualificado - Lead Live Demo",
+                    "data_entrada": datetime.now().strftime("%Y-%m-%d")
+                }
+                df_leads = pd.concat([df_leads, pd.DataFrame([novo_dict])], ignore_index=True)
+                df_leads.to_csv(os.path.join(DATA_DIR, "leads_pacientes.csv"), index=False)
+                st.success(f"✅ Paciente {novo_id} (Juliana Silveira) injetada com sucesso! Já disponível no Gemini Enterprise.")
+                st.rerun()
 
-            with st.container():
-                st.markdown("""
-                <div class="scenario-box">
-                    <div class="scenario-title">🫀 4. Cardiopata com Pressão Alta (Indicação de BiPAP)</div>
-                    <b>Perfil:</b> Homem, 67 anos, arritmia cardíaca, pressão de titulação muito alta (16 cmH2O).<br/>
-                    <b>Racional Clínico:</b> CPAP convencional causaria sobrecarga expiratória e cansaço diafragma.<br/>
-                    <b>Indicação IA:</b> ResMed AirCurve 10 VAuto (BiPAP) com pressão binível.
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button("🚀 Injetar Cenário: Cardiopata BiPAP (Alvaro Ramos)", use_container_width=True):
-                    novo_id = f"LEAD-{1000 + len(df_leads) + 1}"
-                    novo_dict = {
-                        "lead_id": novo_id,
-                        "nome_paciente": "Alvaro Ramos de Souza",
-                        "idade": 67,
-                        "genero": "M",
-                        "telefone": "(21) 98444-5566",
-                        "email": "alvaro.ramos@email.com",
-                        "cidade": "Rio de Janeiro",
-                        "estado": "RJ",
-                        "medico_prescritor": "Dr. Henrique Vasconcellos",
-                        "crm_medico": "CRM-RJ 98.765",
-                        "especialidade_medico": "Cardiologia",
-                        "convenio": "Particular (Reembolso)",
-                        "diagnostico_cid": "G47.3 - Apneia Severa com Insuficiência Cardíaca",
-                        "iah": 48.2,
-                        "spo2_minima": 66.0,
-                        "spo2_media": 87.0,
-                        "pressao_titulada_cmh2o": 16.0,
-                        "respiracao_predominante": "Oral",
-                        "presenca_ronco": "Grave",
-                        "comorbidades": "Insuficiência Cardíaca, Fibrilação Atrial",
-                        "sensibilidade_pressao": "Extrema (intolerante a CPAP convencional)",
-                        "score_prioridade": 99,
-                        "urgencia_comercial": "URGENTE",
-                        "status_funil": "Qualificado - Lead Live Demo",
-                        "data_entrada": datetime.now().strftime("%Y-%m-%d")
-                    }
-                    df_leads = pd.concat([df_leads, pd.DataFrame([novo_dict])], ignore_index=True)
-                    df_leads.to_csv(os.path.join(DATA_DIR, "leads_pacientes.csv"), index=False)
-                    st.success(f"✅ Lead {novo_id} (Alvaro Ramos) cadastrado com sucesso! Recomendado BiPAP.")
-                    st.rerun()
+            st.markdown("""
+            <div class="scenario-card">
+                <div class="scenario-title">🫀 4. Cardiopata com Pressão Alta (Indicação BiPAP)</div>
+                <b>Paciente:</b> Alvaro Ramos de Souza (67 anos, RJ)<br/>
+                <b>Diagnóstico:</b> IAH 48.2 ev/h, SpO2 66%, Pressão 16.0 cmH2O, Insuficiência Cardíaca.<br/>
+                <b>Indicação:</b> BiPAP (Pressão Binível) devido à alta resistência expiratória.
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("🚀 Injetar Paciente 4: Alvaro Ramos", use_container_width=True):
+                novo_id = f"LEAD-{1000 + len(df_leads) + 1}"
+                novo_dict = {
+                    "lead_id": novo_id,
+                    "nome_paciente": "Alvaro Ramos de Souza",
+                    "idade": 67,
+                    "genero": "M",
+                    "telefone": "(21) 98444-5566",
+                    "email": "alvaro.ramos@email.com",
+                    "cidade": "Rio de Janeiro",
+                    "estado": "RJ",
+                    "medico_prescritor": "Dr. Henrique Vasconcellos",
+                    "crm_medico": "CRM-RJ 98.765",
+                    "especialidade_medico": "Cardiologia",
+                    "convenio": "Particular (Reembolso)",
+                    "diagnostico_cid": "G47.3 - Apneia Severa com Insuficiência Cardíaca",
+                    "iah": 48.2,
+                    "spo2_minima": 66.0,
+                    "spo2_media": 87.0,
+                    "pressao_titulada_cmh2o": 16.0,
+                    "respiracao_predominante": "Oral",
+                    "presenca_ronco": "Grave",
+                    "comorbidades": "Insuficiência Cardíaca, Fibrilação Atrial",
+                    "sensibilidade_pressao": "Extrema (intolerante a CPAP convencional)",
+                    "score_prioridade": 99,
+                    "urgencia_comercial": "URGENTE",
+                    "status_funil": "Qualificado - Lead Live Demo",
+                    "data_entrada": datetime.now().strftime("%Y-%m-%d")
+                }
+                df_leads = pd.concat([df_leads, pd.DataFrame([novo_dict])], ignore_index=True)
+                df_leads.to_csv(os.path.join(DATA_DIR, "leads_pacientes.csv"), index=False)
+                st.success(f"✅ Paciente {novo_id} (Alvaro Ramos) injetado com sucesso! Já disponível no Gemini Enterprise.")
+                st.rerun()
 
-    # ABA 2: FORMULÁRIO COMPLETO COM CONTEXTO E OBJEÇÕES
-    with tab_custom_scenario:
-        st.subheader("📝 Gerador Customizado de Lead com Contexto de Vendas & Objeções")
-        st.markdown("Preencha as informações clínicas, o perfil do cliente e as perguntas/objeções dele para gerar uma qualificação completa:")
+    with tab_form_lead:
+        st.subheader("📝 Criador Customizado de Paciente, Laudo e Contexto de Vendas")
+        st.markdown("Preencha para criar um paciente específico e gerar os dados para o Gemini Enterprise:")
         
-        with st.form("form_custom_lead"):
+        with st.form("form_novo_paciente_custom"):
             fc1, fc2, fc3 = st.columns(3)
-            
             with fc1:
-                st.markdown("##### 👤 1. Dados Pessoais e Cadastrais")
-                c_nome = st.text_input("Nome do Paciente", "Dr. Maurício Becker")
-                c_idade = st.number_input("Idade", 18, 95, 51)
+                st.markdown("##### 👤 1. Identificação")
+                c_nome = st.text_input("Nome Completo", "Dr. Maurício Becker")
+                c_idade = st.number_input("Idade", 18, 95, 52)
                 c_genero = st.selectbox("Gênero", ["M", "F"])
-                c_tel = st.text_input("WhatsApp / Telefone", "(11) 98765-4321")
-                c_cidade = st.text_input("Cidade/UF", "São Paulo/SP")
-                c_convenio = st.selectbox("Convênio / Pagamento", ["Bradesco Saúde", "SulAmérica", "Amil One", "Unimed", "Particular / PIX"])
-                
+                c_tel = st.text_input("WhatsApp", "(11) 98765-4321")
+                c_cidade = st.text_input("Cidade / Estado", "São Paulo/SP")
+                c_convenio = st.selectbox("Convênio", ["Bradesco Saúde", "SulAmérica", "Amil One", "Unimed", "Particular"])
             with fc2:
-                st.markdown("##### 🫁 2. Parâmetros Clínicos & Polissonografia")
-                c_iah = st.number_input("IAH (Eventos por Hora)", 1.0, 120.0, 36.4, help=">= 30 é Grave, 15-30 Moderada, <15 Leve")
+                st.markdown("##### 🫁 2. Parâmetros da Polissonografia")
+                c_iah = st.number_input("IAH (Eventos/hora)", 1.0, 120.0, 36.5)
                 c_spo2 = st.number_input("SpO2 Mínima (%)", 50.0, 99.0, 75.0)
-                c_pressao = st.number_input("Pressão Titulada em cmH2O", 4.0, 25.0, 11.5)
-                c_padrao_resp = st.selectbox("Padrão Respiratório", ["Oral / Mista (Respira pela boca)", "Nasal (Respira pelo nariz)", "Exclusivamente Bucal"])
-                c_medico = st.text_input("Médico Prescritor", "Dr. Fernando Albuquerque (CRM-SP 142.890)")
+                c_pressao = st.number_input("Pressão Titulada (cmH2O)", 4.0, 25.0, 11.5)
+                c_resp = st.selectbox("Padrão Respiratório", ["Oral / Mista", "Nasal", "Exclusivamente Bucal"])
+                c_medico = st.text_input("Médico Prescritor", "Dr. Fernando Albuquerque")
                 c_comorb = st.text_input("Comorbidades / Sintomas", "Hipertensão, Sonolência Diurna, Ronco Alto")
-                
             with fc3:
-                st.markdown("##### 💭 3. Contexto Comercial & Objeções do Paciente")
-                c_interesse = st.selectbox("Nível de Interesse do Cliente", ["🔥 Urgência Máxima (Quer comprar hoje)", "⚡ Alto Interesse (Pediu orçamento)", "❄️ Com Receio / Muitas Objeções"])
+                st.markdown("##### 💬 3. Objeções & Contexto do Cliente")
                 c_objecao = st.selectbox(
-                    "Principal Objeção / Dúvida do Cliente:",
+                    "Principal Objeção:",
                     [
-                        "Claustrofobia: 'Tenho medo de me sentir sufocado com a máscara'",
-                        "Ruído: 'Minha esposa tem sono leve e tenho medo do barulho do aparelho'",
-                        "Preço / Condição: 'Achei o valor elevado, preciso parcelar em 12x'",
-                        "Adaptação: 'E se eu comprar e não conseguir me acostumar a dormir com isso?'",
-                        "Plano de Saúde: 'Meu convênio não reembolsa o equipamento?'"
+                        "Claustrofobia: 'Tenho medo de me sentir sufocado'",
+                        "Ruído: 'Tenho medo do barulho acordar minha esposa'",
+                        "Preço: 'Preciso de parcelamento sem juros em 12x'",
+                        "Adaptação: 'E se eu não me acostumar a dormir com o CPAP?'"
                     ]
                 )
-                c_perguntas = st.text_area(
-                    "Pergunta específica feita pelo cliente no WhatsApp:",
-                    "Olá, o médico me passou o laudo com IAH 36, mas tenho medo de não me acostumar com a máscara. Vocês deixam testar antes?",
+                c_pergunta = st.text_area(
+                    "Dúvida enviada pelo cliente no WhatsApp:",
+                    "Olá, recebi a recomendação de CPAP com pressão 11.5, mas tenho muito medo de me sentir sufocado com a máscara. Vocês oferecem garantia de adaptação?",
                     height=100
                 )
                 
-            btn_sub = st.form_submit_button("🚀 Gerar Lead, Criar Laudo no Storage & Calcular Recomendação IA", use_container_width=True)
-            
-            if btn_sub:
+            sub_custom = st.form_submit_button("🚀 Gravar Paciente no BigQuery & Gerar Laudo no Storage", use_container_width=True)
+            if sub_custom:
                 novo_id = f"LEAD-{1000 + len(df_leads) + 1}"
-                is_oral = "oral" in c_padrao_resp.lower() or "bucal" in c_padrao_resp.lower()
-                
-                # Gera laudo em TXT na pasta de storage
                 first_name = c_nome.split()[0].lower()
                 last_name = c_nome.split()[-1].lower()
+                
+                # Gera laudo em TXT no storage
                 laudo_txt_path = os.path.join(STORAGE_DIR, "laudos_polissonografia", f"laudo_psg_{first_name}_{last_name}.txt")
-                
-                laudo_content = f"""CLÍNICA DE MEDICINA DO SONO E DIAGNÓSTICO RESPIRATÓRIO
-LAUDO DE POLISSONOGRAFIA DE NOITE INTEIRA (PSG)
---------------------------------------------------------------------------------
-PACIENTE: {c_nome} | IDADE: {c_idade} anos | DATA: {datetime.now().strftime('%d/%m/%Y')}
-MÉDICO RESPONSÁVEL: {c_medico}
-
-PARÂMETROS REGISTRADOS:
-- Tempo Total de Registro: 460 minutos
-- Eficiência do Sono: 79.4%
-- Índice de Apneia e Hipopneia (IAH): {c_iah} eventos/hora ({'GRAVE' if c_iah>=30 else ('MODERADA' if c_iah>=15 else 'LEVE')})
-- Saturação Mínima de O2 (SpO2): {c_spo2}%
-- Dessaturações registradas: 142 episódios
-- Padrão Respiratório: {c_padrao_resp}
-- Pressão Titulada Recomendada: {c_pressao} cmH2O
-- Comorbidades: {c_comorb}
-
-CONCLUSÃO DIAGNÓSTICA:
-Quadro compatível com Síndrome da Apneia Obstrutiva do Sono (SAOS).
-Prescrição de terapia por pressão positiva contínua (CPAP) com titulação automática.
-Interface recomendada de acordo com o padrão respiratório do paciente.
-"""
                 with open(laudo_txt_path, "w", encoding="utf-8") as f:
-                    f.write(laudo_content)
+                    f.write(f"CLÍNICA DE MEDICINA DO SONO\nLAUDO DE POLISSONOGRAFIA\nPACIENTE: {c_nome}\nIAH: {c_iah} ev/h\nSpO2 Mínima: {c_spo2}%\nPressão: {c_pressao} cmH2O\nRespiração: {c_resp}\nMédico: {c_medico}\nComorbidades: {c_comorb}\nObjeção Registrada: {c_objecao}")
                     
-                score = 95 if c_iah >= 30 else (85 if c_iah >= 15 else 70)
-                urgencia = "URGENTE" if c_iah >= 35 else ("ALTA" if c_iah >= 20 else "MEDIA")
-                
                 novo_dict = {
                     "lead_id": novo_id,
                     "nome_paciente": c_nome,
@@ -585,458 +536,141 @@ Interface recomendada de acordo com o padrão respiratório do paciente.
                     "email": f"{first_name}.{last_name}@email.com",
                     "cidade": c_cidade.split("/")[0],
                     "estado": c_cidade.split("/")[-1] if "/" in c_cidade else "SP",
-                    "medico_prescritor": c_medico.split("(")[0].strip(),
-                    "crm_medico": c_medico.split("(")[-1].replace(")", "") if "(" in c_medico else "CRM-SP 142.890",
-                    "especialidade_medico": "Pneumologia e Medicina do Sono",
+                    "medico_prescritor": c_medico,
+                    "crm_medico": "CRM-SP 142.890",
+                    "especialidade_medico": "Pneumologia",
                     "convenio": c_convenio,
-                    "diagnostico_cid": f"G47.3 - Apneia Obstrutiva do Sono ({'Grave' if c_iah >= 30 else 'Moderada'})",
+                    "diagnostico_cid": f"G47.3 - Apneia Obstrutiva ({'Grave' if c_iah>=30 else 'Moderada'})",
                     "iah": c_iah,
                     "spo2_minima": c_spo2,
                     "spo2_media": 92.0,
                     "pressao_titulada_cmh2o": c_pressao,
-                    "respiracao_predominante": c_padrao_resp,
-                    "presenca_ronco": "Alto / Frequente",
-                    "comorbidades": f"{c_comorb} | Objeção: {c_objecao.split(':')[0]}",
-                    "sensibilidade_pressao": "Alta" if c_pressao >= 12 else "Média",
-                    "score_prioridade": score,
-                    "urgencia_comercial": urgencia,
-                    "status_funil": f"Qualificado - {c_interesse.split()[0]}",
+                    "respiracao_predominante": c_resp,
+                    "presenca_ronco": "Alto",
+                    "comorbidades": f"{c_comorb} | Objeção: {c_objecao}",
+                    "sensibilidade_pressao": "Média",
+                    "score_prioridade": 95 if c_iah>=30 else 80,
+                    "urgencia_comercial": "URGENTE" if c_iah>=30 else "ALTA",
+                    "status_funil": "Qualificado - Lead Live Demo",
                     "data_entrada": datetime.now().strftime("%Y-%m-%d")
                 }
-                
                 df_leads = pd.concat([df_leads, pd.DataFrame([novo_dict])], ignore_index=True)
                 df_leads.to_csv(os.path.join(DATA_DIR, "leads_pacientes.csv"), index=False)
-                
-                st.success(f"🎉 Lead **{novo_id} ({c_nome})** criado com sucesso e laudo gravado no Cloud Storage!")
-                st.info(f"💡 **Recomendação Calculada:** Equipamento com pressão de {c_pressao} cmH2O e máscara {'Facial Full Face' if is_oral or c_pressao >= 12 else 'Nasal / Pillow'}. Veja no Cockpit!")
+                st.success(f"🎉 Paciente **{novo_id} ({c_nome})** cadastrado e laudo gravado no Storage! Pronto para consulta no Gemini Enterprise.")
                 st.rerun()
 
-    # ABA 3: HISTÓRICO DE COMPRAS (RECORRÊNCIA E LTV)
-    with tab_hist_gen:
-        st.subheader("🔄 Gerador de Histórico de Compras & Recorrência de Insumos")
-        st.markdown("Adicione compras simuladas para pacientes com datas retroativas para gerar alertas automáticos de troca de máscara e filtros:")
+    with tab_form_hist:
+        st.subheader("🔄 Injetor de Histórico de Compras e Recorrência (LTV)")
+        st.markdown("Adicione registros de compras antigas para testar alertas de reposição periódica no Gemini Enterprise:")
         
-        with st.form("form_hist_compra"):
-            h_col1, h_col2 = st.columns(2)
-            with h_col1:
-                h_paciente = st.selectbox("Selecione o Paciente Existente:", df_leads['nome_paciente'].tolist() if not df_leads.empty else ["Roberto Silveira Santos"])
-                h_equip = st.selectbox("Equipamento Comprado Anteriormente:", ["CPAP-RES-AS11 - ResMed AirSense 11", "CPAP-RES-AS10 - ResMed AirSense 10", "BIPAP-RES-AC10 - ResMed AirCurve 10"])
-                h_mask = st.selectbox("Máscara Utilizada:", ["MSK-RES-F20 - AirFit F20 Full Face", "MSK-RES-N20 - AirFit N20 Nasal", "MSK-RES-P10 - AirFit P10 Pillow"])
-            with h_col2:
-                h_dias = st.slider("Dias desde a última troca de almofada de silicone:", 30, 360, 210)
-                h_valor = st.number_input("Valor Estimado do Kit de Reposição (R$):", 100.0, 1500.0, 480.0)
+        with st.form("form_hist_ltv"):
+            hc1, hc2 = st.columns(2)
+            with hc1:
+                h_pac = st.selectbox("Paciente:", df_leads['nome_paciente'].tolist() if not df_leads.empty else ["Roberto Silveira Santos"])
+                h_prod = st.selectbox("Equipamento / Máscara:", ["CPAP ResMed AirSense 11", "Máscara Facial AirFit F20", "Máscara Nasal AirFit N20"])
+            with hc2:
+                h_dias = st.slider("Dias desde a compra da almofada de silicone:", 30, 300, 200)
+                h_val = st.number_input("Valor do Kit de Reposição (R$):", 100.0, 1500.0, 490.0)
                 
-            sub_h = st.form_submit_button("➕ Injetar Registro de Recorrência no BigQuery")
+            sub_h = st.form_submit_button("➕ Gravar Histórico de Compras no BigQuery")
             if sub_h:
                 data_compra = (datetime.now() - timedelta(days=h_dias)).strftime("%Y-%m-%d")
-                lead_id_match = df_leads[df_leads['nome_paciente'] == h_paciente].iloc[0]['lead_id'] if not df_leads.empty else "LEAD-1001"
-                
-                novo_hist = {
+                lead_id_m = df_leads[df_leads['nome_paciente'] == h_pac].iloc[0]['lead_id'] if not df_leads.empty else "LEAD-1001"
+                novo_h = {
                     "historico_id": f"HIST-{2000 + len(df_hist) + 1}",
-                    "lead_id": lead_id_match,
-                    "nome_paciente": h_paciente,
+                    "lead_id": lead_id_m,
+                    "nome_paciente": h_pac,
                     "data_compra_inicial": (datetime.now() - timedelta(days=h_dias+90)).strftime("%Y-%m-%d"),
-                    "produto_sku": h_equip.split(" - ")[0],
-                    "mascara_sku": h_mask.split(" - ")[0],
+                    "produto_sku": "CPAP-RES-AS11",
+                    "mascara_sku": "MSK-RES-F20",
                     "data_ultima_troca_mascara": data_compra,
                     "dias_desde_troca_mascara": h_dias,
-                    "status_adesao": "Adesão Alta (Uso > 6h/noite)",
-                    "alerta_reposicao": "🚨 TROCA URGENTE: Silicone com mais de 6 meses" if h_dias >= 180 else "⚠️ Manutenção Periódica",
-                    "valor_recorrente_estimado_brl": h_valor
+                    "status_adesao": "Adesão Alta",
+                    "alerta_reposicao": "🚨 TROCA URGENTE: Silicone com mais de 6 meses" if h_dias>=180 else "⚠️ Manutenção Regular",
+                    "valor_recorrente_estimado_brl": h_val
                 }
-                
-                df_hist = pd.concat([df_hist, pd.DataFrame([novo_hist])], ignore_index=True)
+                df_hist = pd.concat([df_hist, pd.DataFrame([novo_h])], ignore_index=True)
                 df_hist.to_csv(os.path.join(DATA_DIR, "historico_compras_trocas.csv"), index=False)
-                st.success(f"✅ Histórico adicionado para **{h_paciente}** ({h_dias} dias de uso). Veja na aba Recorrência!")
+                st.success(f"✅ Histórico adicionado para **{h_pac}** ({h_dias} dias de uso).")
                 st.rerun()
 
 # ==============================================================================
-# MENU 2: COCKPIT COMERCIAL & QUALIFICAÇÃO
+# MENU 3: INSPEÇÃO DE FONTES DE DADOS (BIGQUERY & STORAGE)
 # ==============================================================================
-elif "2. Cockpit" in menu:
-    st.markdown('<div class="main-header">🩺 Cockpit Comercial & Triagem de Pacientes</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Qualificação automática de prescrições médicas e laudos polissonográficos via Gemini</div>', unsafe_allow_html=True)
+elif "3. Inspeção" in menu:
+    st.markdown('<div class="main-header">📊 Inspeção de Fontes de Dados (Data Source Hub)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Confira o catálogo de dados estruturados e não estruturados que alimentam as respostas do <b>Gemini Enterprise</b>.</div>', unsafe_allow_html=True)
     
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Total de Pacientes no CRM", len(df_leads), "+ Base ao Vivo")
-    with col2:
-        urgentes = len(df_leads[df_leads['urgencia_comercial'].isin(['URGENTE', 'ALTA'])]) if not df_leads.empty else 0
-        pct = int(urgentes/len(df_leads)*100) if len(df_leads) > 0 else 0
-        st.metric("Prioridade Alta / Crítica", f"{urgentes} leads", f"{pct}% da base")
-    with col3:
-        st.metric("Ticket Médio c/ Cross-Sell", "R$ 6.945,00", "+22% rentabilidade")
-    with col4:
-        st.metric("Ciclo Comercial Médio", "1.8 dias", "-55% c/ IA")
-
-    st.markdown("---")
-    st.subheader("📋 Fila de Leads Qualificados em Tempo Real")
+    tab_bq, tab_gcs, tab_mcp = st.tabs([
+        "📊 Tabelas do BigQuery (`luminar_saude`)",
+        "🗄️ Arquivos no Cloud Storage (`gs://...`)",
+        "🛠️ Ferramentas MCP & OpenAPI"
+    ])
     
-    if not df_leads.empty:
-        display_df = df_leads[['lead_id', 'nome_paciente', 'idade', 'convenio', 'diagnostico_cid', 'iah', 'spo2_minima', 'pressao_titulada_cmh2o', 'respiracao_predominante', 'urgencia_comercial', 'score_prioridade']].copy()
-        display_df.columns = ['ID Lead', 'Paciente', 'Idade', 'Convênio', 'Diagnóstico CID', 'IAH (ev/h)', 'SpO2 Mín (%)', 'Pressão cmH2O', 'Respiração', 'Urgência', 'Score IA']
-        st.dataframe(display_df, use_container_width=True, hide_index=True)
+    with tab_bq:
+        st.markdown("#### 1. Tabela: `leads_pacientes` (CRM e Parâmetros Clínicos)")
+        st.dataframe(df_leads, use_container_width=True, hide_index=True)
         
-        st.markdown("---")
-        st.subheader("🔍 Inspeção de Laudo Clínico e Parâmetros Polissonográficos")
+        st.markdown("#### 2. Tabela: `catalogo_produtos` (CPAPs, BiPAPs e Máscaras)")
+        st.dataframe(df_catalogo, use_container_width=True, hide_index=True)
         
-        selected_name = st.selectbox("Selecione o paciente:", df_leads['nome_paciente'].tolist())
-        p_info = df_leads[df_leads['nome_paciente'] == selected_name].iloc[0]
-        
-        c_left, c_right = st.columns([1.2, 1])
-        
-        with c_left:
-            st.markdown(f"### 🫁 Ficha Médica: **{p_info['nome_paciente']}** ({p_info['lead_id']})")
-            st.markdown(f"""
-            - **Idade / Gênero:** {p_info['idade']} anos ({p_info['genero']})
-            - **Contato:** {p_info['telefone']} | {p_info['email']}
-            - **Cidade/Estado:** {p_info['cidade']}/{p_info['estado']}
-            - **Médico Prescritor:** {p_info['medico_prescritor']} ({p_info['crm_medico']})
-            - **Convênio / Plano:** {p_info['convenio']}
-            - **Comorbidades:** `{p_info['comorbidades']}`
-            """)
-            
-            iah = float(p_info['iah'])
-            if iah >= 30:
-                st.error(f"🚨 **Apneia Obstrutiva do Sono Grave (IAH: {iah} ev/h)**: Dessaturação de oxigênio crítica até **{p_info['spo2_minima']}%**. Risco cardiovascular iminente. Exige abordagem comercial em menos de 2 horas.")
-            elif iah >= 15:
-                st.warning(f"⚠️ **Apneia Obstrutiva Moderada (IAH: {iah} ev/h)**: SpO2 mínima de {p_info['spo2_minima']}%. Indicação de CPAP Auto.")
-            else:
-                st.info(f"ℹ️ **Apneia Leve (IAH: {iah} ev/h)**: Foco em conforto respiratório e eliminação do ronco.")
-
-        with c_right:
-            st.markdown("### 📄 Extração Multimodal do Laudo (PDF no Cloud Storage)")
-            first_name = p_info['nome_paciente'].split()[0].lower()
-            last_name = p_info['nome_paciente'].split()[-1].lower()
-            txt_filename = f"laudo_psg_{first_name}_{last_name}.txt"
-            txt_path = os.path.join(STORAGE_DIR, "laudos_polissonografia", txt_filename)
-            
-            if os.path.exists(txt_path):
-                with open(txt_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                st.text_area("Extrato do Laudo Polissonográfico Processado por IA:", content, height=180)
-            else:
-                st.info(f"Laudo gerado dinamicamente para {p_info['nome_paciente']} (IAH {p_info['iah']}, Pressão {p_info['pressao_titulada_cmh2o']} cmH2O).")
-                
-            pdf_filename = f"laudo_psg_{first_name}_{last_name}.pdf"
-            pdf_path = os.path.join(STORAGE_DIR, "laudos_polissonografia", pdf_filename)
-            if os.path.exists(pdf_path):
-                with open(pdf_path, "rb") as f_pdf:
-                    st.download_button(
-                        label=f"📥 Baixar Laudo Clínico Original em PDF",
-                        data=f_pdf,
-                        file_name=pdf_filename,
-                        mime="application/pdf"
-                    )
-
-# ==============================================================================
-# MENU 3: COPILOTO DE RECOMENDAÇÃO DE CPAP
-# ==============================================================================
-elif "3. Copiloto" in menu:
-    st.markdown('<div class="main-header">🎯 Copiloto de Recomendação de Produtos & Quebra de Objeções</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Matching automatizado entre padrão respiratório, pressão prescrita e catálogo de CPAPs/Máscaras</div>', unsafe_allow_html=True)
-    
-    if not df_leads.empty:
-        lead_select = st.selectbox("Selecione o Lead / Paciente:", df_leads['nome_paciente'].tolist())
-        lead_row = df_leads[df_leads['nome_paciente'] == lead_select].iloc[0]
-        
-        # Busca na tabela de recomendação ou calcula dinamicamente
-        rec_match = df_rec[df_rec['lead_id'] == lead_row['lead_id']] if not df_rec.empty else pd.DataFrame()
-        
-        if not rec_match.empty:
-            rec = rec_match.iloc[0]
-            equip_nome = rec['equipamento_principal_nome']
-            equip_sku = rec['equipamento_principal_sku']
-            mask_nome = rec['mascara_recomendada_nome']
-            mask_sku = rec['mascara_recomendada_sku']
-            cross_sell = rec['insumos_cross_sell']
-            valor_total = float(rec['valor_total_pacote_brl'])
-            condicao = rec['condicao_comercial_sugerida']
-            argumento = rec['argumentacao_venda_ia']
-            objecoes = rec['quebra_objecoes']
-            prob = float(rec['probabilidade_conversao'])
-        else:
-            # Fallback dinâmico
-            is_oral = "oral" in str(lead_row.get("respiracao_predominante", "")).lower() or "bucal" in str(lead_row.get("respiracao_predominante", "")).lower()
-            pressao = float(lead_row.get("pressao_titulada_cmh2o", 10.0))
-            if pressao > 14:
-                equip_nome, equip_sku, eq_preco = "ResMed AirCurve 10 VAuto (BiPAP)", "BIPAP-RES-AC10", 9800.0
-            else:
-                equip_nome, equip_sku, eq_preco = "ResMed AirSense 11 AutoSet", "CPAP-RES-AS11", 5890.0
-                
-            if is_oral or pressao >= 12:
-                mask_nome, mask_sku, mk_preco = "AirFit F20 Full Face (Facial)", "MSK-RES-F20", 890.0
-            else:
-                mask_nome, mask_sku, mk_preco = "AirFit N20 Nasal Compacta", "MSK-RES-N20", 690.0
-                
-            cross_sell = "Tubo Aquecido ClimateLineAir + Kit Filtros Hipoalergênicos + Lenços CPAP Wipes"
-            valor_total = eq_preco + mk_preco + 390.0 + 150.0 + 75.0
-            condicao = f"12x de R$ {valor_total/12:.2f} sem juros ou 8% desc. no PIX (R$ {valor_total*0.92:.2f})"
-            argumento = f"Paciente com pressão de {pressao} cmH2O e respiração {lead_row.get('respiracao_predominante')}. Indicação direta do {equip_nome} com alívio expiratório e máscara {mask_nome} para evitar fuga aérea."
-            objecoes = "Reforçar o programa 'Luminar Adaptação 30 Dias' (troca grátis de modelo de máscara caso sinta desconforto)."
-            prob = 0.92
-
-        col_l, col_r = st.columns([1.3, 1])
-        
-        with col_l:
-            st.markdown(f"### 💡 Pacote Recomendado para **{lead_row['nome_paciente']}**")
-            
-            st.markdown(f"""
-            <div class="product-card">
-                <h4 style="color:#0369A1; margin:0;">1. Equipamento Principal: {equip_nome}</h4>
-                <p style="margin:2px 0 0 0;"><b>Código SKU:</b> <code>{equip_sku}</code> | Conectividade 4G AirView</p>
-            </div>
-            <div class="product-card">
-                <h4 style="color:#0D9488; margin:0;">2. Interface / Máscara: {mask_nome}</h4>
-                <p style="margin:2px 0 0 0;"><b>Código SKU:</b> <code>{mask_sku}</code> | Silicone Ultra Confortável</p>
-            </div>
-            <div class="product-card">
-                <h4 style="color:#16A34A; margin:0;">3. Insumos Cross-Sell & Acessórios</h4>
-                <p style="margin:2px 0 0 0;">{cross_sell}</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("#### 🧠 Racional Clínico-Comercial da IA")
-            st.info(argumento)
-            
-            st.markdown("#### 🛡️ Quebra de Objeções para o Consultor")
-            st.warning(f"**Como converter a venda:**\n\n{objecoes}")
-
-        with col_r:
-            st.markdown("### 💰 Proposta Comercial & Conversão")
-            st.metric("Valor Total do Pacote", f"R$ {valor_total:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-            st.metric("Probabilidade de Conversão IA", f"{int(prob*100)}%", "+28% acima do canal padrão")
-            
-            st.markdown("#### 💳 Condições de Pagamento")
-            st.success(f"**Opções Comerciais:**\n\n{condicao}")
-            
-            st.markdown("#### ⚡ Ações Rápidas")
-            if st.button("📲 Disparar Proposta no WhatsApp", use_container_width=True):
-                st.toast(f"Proposta enviada para {lead_row['telefone']}!")
-            if st.button("📧 Gerar E-mail Formal (Gmail)", use_container_width=True):
-                st.toast(f"E-mail rascunhado para {lead_row['email']}!")
-            if st.button("📁 Salvar Dossier no Google Drive", use_container_width=True):
-                st.toast("Dossier do paciente salvo no Drive corporativo!")
-
-# ==============================================================================
-# MENU 4: AGENT PLATFORM & MCP PLAYGROUND
-# ==============================================================================
-elif "4. Agent Platform" in menu:
-    st.markdown('<div class="main-header">🤖 Agent Platform & MCP Tools Playground</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Integração do Gemini via Model Context Protocol (MCP) com as ferramentas clínicas e comerciais</div>', unsafe_allow_html=True)
-    
-    st.markdown("""
-    Este ambiente simula o **Vertex AI Agent Builder / Agent Platform** conectado ao MCP Server da Luminar Saúde.
-    As ferramentas abaixo são chamadas autonomamente pelo modelo para responder às dúvidas do vendedor.
-    """)
-    
-    tab_chat, tab_tools, tab_manifest = st.tabs(["💬 Chat com o Copiloto Comercial", "🛠️ Ferramentas MCP Disponíveis", "📋 Manifest & OpenAPI"])
-    
-    with tab_chat:
-        st.subheader("Interaja com o Copiloto de Vendas da Luminar Saúde")
-        
-        exemplo_pergunta = st.selectbox(
-            "Perguntas Rápidas de Exemplo:",
-            [
-                "Qual é o diagnóstico e a pressão recomendada para o paciente Roberto Silveira Santos?",
-                "Qual combo de CPAP e máscara devo oferecer para a paciente Mariana Costa e por que?",
-                "O paciente Carlos Eduardo tem pressão de 15 cmH2O e queixa de cansaço. Devo indicar CPAP ou BiPAP?",
-                "Gere um script de WhatsApp para fechar a venda com o paciente Roberto Silveira."
-            ]
-        )
-        
-        user_query = st.text_input("Ou digite sua pergunta para o Agent:", exemplo_pergunta)
-        
-        if st.button("Enviar para o Gemini Agent"):
-            with st.spinner("O Agent está consultando o MCP Server e BigQuery..."):
-                if "Roberto" in user_query:
-                    st.markdown("""
-                    **🤖 Resposta do Agent (Vertex AI Gemini 1.5):**
-                    
-                    > 🔎 **Tool Executada:** `consultar_paciente(lead_id="LEAD-1001")`  
-                    > 🔎 **Tool Executada:** `recomendar_produtos(lead_id="LEAD-1001")`
-                    
-                    Olá! O paciente **Roberto Silveira Santos** (52 anos) possui **Apneia Obstrutiva Grave (IAH: 38.4 eventos/hora)** com SpO2 mínima de 74%.
-                    
-                    **Conduta recomendada pela IA:**
-                    1. **Equipamento:** ResMed AirSense 11 AutoSet (com alívio expiratório EPR no nível 3).
-                    2. **Máscara:** ResMed AirFit F20 Full Face (Tamanho G). Como ele é respirador oral e a pressão titulada é **12 cmH2O**, a máscara facial é estritamente necessária para evitar escape de ar pela boca.
-                    3. **Acessório Obrigatório:** Tubo Aquecido ClimateLineAir para evitar ressecamento da via aérea.
-                    4. **Valor do Pacote:** R$ 7.345,00 (12x de R$ 612,08 sem juros).
-                    """)
-                elif "Mariana" in user_query:
-                    st.markdown("""
-                    **🤖 Resposta do Agent (Vertex AI Gemini 1.5):**
-                    
-                    > 🔎 **Tool Executada:** `consultar_paciente(lead_id="LEAD-1002")`  
-                    > 🔎 **Tool Executada:** `recomendar_produtos(lead_id="LEAD-1002")`
-                    
-                    A paciente **Mariana Costa Andrade** tem **Apneia Moderada (IAH: 21.2)** com pressão titulada de **8.5 cmH2O**.
-                    
-                    **Recomendação Personalizada:**
-                    - **Equipamento:** ResMed AirSense 10 AutoSet 4G.
-                    - **Máscara:** AirFit P10 (Almofadas Nasais ultraleves de apenas 45g). Como a paciente relata **claustrofobia** e respira pelo nariz, a P10 elimina a sensação de sufocamento.
-                    - **Cross-Sell:** Kit de Filtros Hipoalergênicos (ela tem rinite alérgica crônica).
-                    """)
-                elif "Carlos" in user_query or "BiPAP" in user_query:
-                    st.markdown("""
-                    **🤖 Resposta do Agent (Vertex AI Gemini 1.5):**
-                    
-                    > 🔎 **Tool Executada:** `consultar_paciente(lead_id="LEAD-1003")`
-                    
-                    Para o paciente **Carlos Eduardo Paes**, a indicação correta é o **BiPAP (AirCurve 10 VAuto)** pelos seguintes motivos clínicos:
-                    1. A pressão prescrita é muito alta (**15 cmH2O**), o que causa alta resistência para expirar em CPAPs comuns.
-                    2. Ele possui **comorbidade cardíaca** (arritmia e insuficiência leve) e IAH crítico (46.0). O BiPAP reduz o trabalho cardíaco durante o sono.
-                    """)
-                else:
-                    st.markdown("""
-                    **🤖 Resposta do Agent (Vertex AI Gemini 1.5):**
-                    
-                    > 🔎 **Tool Executada:** `gerar_pitch_vendas(lead_id="LEAD-1001", canal="whatsapp")`
-                    
-                    **Mensagem formatada para o WhatsApp do paciente:**
-                    
-                    ```text
-                    Olá, Roberto! Tudo bem? Aqui é o consultor da Luminar Saúde.
-                    Recebemos o encaminhamento do Dr. Fernando Albuquerque para o seu tratamento de sono.
-                    
-                    Montamos seu kit exclusivo com o silencioso ResMed AirSense 11 e a máscara AirFit F20, 
-                    com o programa "Luminar Adaptação 30 Dias" (troca grátis de modelo se não se adaptar).
-                    
-                    Podemos agendar a visita do nosso fisioterapeuta na sua casa hoje às 16h?
-                    ```
-                    """)
-                    
-    with tab_tools:
-        st.markdown("""
-        ### Ferramentas MCP Registradas no Agent:
-        
-        | Nome da Tool | Finalidade | Endpoint HTTP |
-        | :--- | :--- | :--- |
-        | `consultar_paciente` | Busca dados do laudo, IAH, SpO2 e pressão | `GET /tools/consultar_paciente` |
-        | `recomendar_produtos` | Matching clínico de CPAP, máscara e tubos | `GET /tools/recomendar_produtos` |
-        | `gerar_pitch_vendas` | Copywriting empático para WhatsApp e e-mail | `GET /tools/gerar_pitch_vendas` |
-        | `criar_novo_lead` | Injeta paciente na base e qualifica na hora | `POST /tools/criar_novo_lead` |
-        """)
-        
-    with tab_manifest:
-        st.subheader("Manifest JSON do MCP Server (`/mcp/manifest.json`)")
-        manifest_data = {
-            "schema_version": "v1",
-            "name_for_model": "luminar_saude_sales_copilot",
-            "description": "Ferramentas para medicina do sono, prescrições de CPAP e recomendações comerciais Luminar Saúde.",
-            "tools": ["consultar_paciente", "recomendar_produtos", "gerar_pitch_vendas", "criar_novo_lead"]
-        }
-        st.json(manifest_data)
-
-# ==============================================================================
-# MENU 5: SIMULADOR WORKSPACE (GMAIL & DRIVE)
-# ==============================================================================
-elif "5. Simulador Workspace" in menu:
-    st.markdown('<div class="main-header">✉️ Simulador Google Workspace (Gmail & Drive)</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Demonstração da experiência do usuário no ecossistema Google Workspace</div>', unsafe_allow_html=True)
-    
-    tab_gmail, tab_drive = st.tabs(["📧 Caixa de Entrada Gmail Simulada", "📁 Pastas do Google Drive"])
-    
-    with tab_gmail:
-        st.subheader("Inbox: consultores@luminarsaude.com.br")
-        
-        with st.expander("📩 [NOVO] Dr. Fernando Albuquerque — Encaminhamento de Paciente com Apneia Grave (Roberto Silveira)", expanded=True):
-            st.markdown("""
-            <div class="gmail-box">
-                <div class="gmail-subject">Encaminhamento de Paciente com Apneia Grave - Roberto Silveira Santos</div>
-                <div class="gmail-sender">De: Dr. Fernando Albuquerque &lt;fernando.albuquerque@clinicasul.med.br&gt;</div>
-                <p><b>Data:</b> 20 de Agosto de 2026 às 14:32</p>
-                <hr/>
-                <p>Prezada equipe comercial e clínica da Luminar Saúde,</p>
-                <p>Encaminho em anexo o laudo polissonográfico e a receita médica do paciente Roberto Silveira Santos (52 anos).<br/>
-                Diagnóstico: Apneia Obstrutiva do Sono Grave (IAH 38.4/h, dessaturação até 74%). Pressão titulada: 12 cmH2O.<br/>
-                <b>Observação:</b> Paciente é respirador oral. Por favor ofertar máscara oronasal AirFit F20 e tubo aquecido.</p>
-                <p>Atenciosamente,<br/><b>Dr. Fernando Albuquerque</b> (CRM-SP 142.890)</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        with st.expander("📤 Proposta Comercial Enviada ao Paciente Roberto Silveira Santos"):
-            st.markdown("""
-            <div class="gmail-box">
-                <div class="gmail-subject">Proposta Personalizada de Tratamento CPAP - Luminar Saúde & Dr. Fernando</div>
-                <div class="gmail-sender">De: Lucas Viana - Especialista do Sono &lt;lucas.viana@luminarsaude.com.br&gt;</div>
-                <p><b>Para:</b> Roberto Silveira Santos &lt;roberto.silveira@email.com&gt;</p>
-                <hr/>
-                <p>Olá, Sr. Roberto, tudo bem?</p>
-                <p>Estruturamos o pacote sob medida para sua terapia com o <b>ResMed AirSense 11 AutoSet</b> + <b>Máscara AirFit F20</b> + <b>Tubo ClimateLine</b>.</p>
-                <p><b>Condição Especial:</b> 12x de R$ 612,08 sem juros ou R$ 6.757,40 à vista com o Programa Luminar Adaptação 30 Dias!</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        with st.expander("🌟 Follow-up 7 Dias de Terapia Concluídos com Sucesso (AirView)"):
-            st.markdown("""
-            <div class="gmail-box">
-                <div class="gmail-subject">7 Dias de Terapia CPAP Concluídos! Parabéns pela Adesão! 🌟</div>
-                <div class="gmail-sender">De: Suporte Clínico Luminar &lt;suporte@luminarsaude.com.br&gt;</div>
-                <hr/>
-                <p>Prezado Sr. Roberto, nosso telemonitoramento AirView registrou 6h45m de uso médio por noite e seu IAH caiu de 38.4 para 1.2 ev/h!</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-    with tab_drive:
-        st.subheader("Estrutura no Google Drive Corporativo (`Luminar Saúde / Vendas & Clínico`)")
-        st.markdown("""
-        ```text
-        📁 Google Drive / Luminar Saúde
-        ├── 📁 01_Laudos_Polissonografia/
-        │   ├── 📄 Laudo_PSG_Roberto_Silveira.pdf
-        │   ├── 📄 Laudo_PSG_Mariana_Costa.pdf
-        │   └── 📄 Laudo_PSG_Carlos_Eduardo.pdf
-        ├── 📁 02_Playbooks_e_Treinamentos/
-        │   └── 📘 Playbook_Vendas_CPAP_Luminar.gdoc
-        ├── 📁 03_Planilhas_CRM_e_Precos/
-        │   ├── 📊 CRM_Leads_Luminar_Saude.gsheet
-        │   └── 📊 Catalogo_Produtos_Precos.gsheet
-        └── 📁 04_Propostas_Comerciais_Geradas/
-            ├── 📑 Proposta_Roberto_Silveira_AirSense11.gdoc
-            └── 📑 Proposta_Carlos_Eduardo_BiPAP.gdoc
-        ```
-        """)
-
-# ==============================================================================
-# MENU 6: RECORRÊNCIA & LTV (INSUMOS)
-# ==============================================================================
-elif "6. Recorrência" in menu:
-    st.markdown('<div class="main-header">🔄 Gestão de Recorrência & Reposição de Insumos (LTV)</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Motor proativo de reposição de almofadas de silicone, filtros e tubos</div>', unsafe_allow_html=True)
-    
-    if not df_hist.empty:
+        st.markdown("#### 3. Tabela: `historico_compras_trocas` (Recorrência de Insumos)")
         st.dataframe(df_hist, use_container_width=True, hide_index=True)
         
-        st.subheader("🔔 Oportunidades Automáticas de Recompra")
-        for idx, row in df_hist.iterrows():
-            with st.expander(f"⚠️ {row['nome_paciente']} — {row['dias_desde_troca_mascara']} dias sem trocar máscara de silicone"):
-                st.markdown(f"""
-                - **Equipamento Atual:** `{row['produto_sku']}`
-                - **Data da Última Troca de Máscara:** {row['data_ultima_troca_mascara']}
-                - **Alerta do Sistema:** `{row['alerta_reposicao']}`
-                - **Potencial de Receita Imediata:** R$ {row['valor_recorrente_estimado_brl']:,.2f}
-                """)
-                if st.button(f"📲 Disparar Lembrete de Troca para {row['nome_paciente']}", key=f"btn_recom_{idx}"):
-                    st.toast(f"Lembrete de reposição enviado para {row['nome_paciente']} via WhatsApp!")
+    with tab_gcs:
+        st.markdown("#### 📁 Documentos não estruturados indexados para busca multimodal pelo Gemini")
+        
+        laudos_files = glob.glob(os.path.join(STORAGE_DIR, "laudos_polissonografia", "*.*"))
+        receitas_files = glob.glob(os.path.join(STORAGE_DIR, "receitas_medicas", "*.*"))
+        manuais_files = glob.glob(os.path.join(STORAGE_DIR, "catalogos_manuais", "*.*"))
+        
+        st.markdown(f"**Laudos de Polissonografia:** `{len(laudos_files)} arquivos` | **Receitas Médicas:** `{len(receitas_files)} arquivos` | **Manuais Técnicos:** `{len(manuais_files)} arquivos`")
+        
+        col_g1, col_g2 = st.columns(2)
+        with col_g1:
+            st.markdown("##### 📄 Laudos Médicos Disponíveis:")
+            for f in laudos_files:
+                st.code(os.path.basename(f), language="text")
+        with col_g2:
+            st.markdown("##### 📄 Prescrições e Manuais:")
+            for f in receitas_files + manuais_files:
+                st.code(os.path.basename(f), language="text")
+                
+    with tab_mcp:
+        st.markdown("#### 🛠️ Ferramentas MCP expostas pelo Cloud Run para o Gemini Enterprise")
+        st.markdown("""
+        | Nome da Tool | Finalidade | Endpoint HTTP |
+        | :--- | :--- | :--- |
+        | `consultar_paciente` | Busca IAH, SpO2, pressão titulada e histórico clínico | `GET /tools/consultar_paciente` |
+        | `recomendar_produtos` | Matching clínico de CPAP, modelo de máscara e tubos | `GET /tools/recomendar_produtos` |
+        | `gerar_pitch_vendas` | Geração de propostas com quebra de objeções para WhatsApp/Gmail | `GET /tools/gerar_pitch_vendas` |
+        | `criar_novo_lead` | Injeta paciente na base e qualifica na hora | `POST /tools/criar_novo_lead` |
+        """)
+        st.markdown(f"**OpenAPI 3.0 Spec:** `/openapi.json` | **MCP Manifest:** `/mcp/manifest.json`")
 
 # ==============================================================================
-# MENU 7: GOOGLE CLOUD ARCHITECTURE
+# MENU 4: CONEXÕES DO GEMINI ENTERPRISE & RESET DA BASE
 # ==============================================================================
-elif "7. Google Cloud" in menu:
-    st.markdown('<div class="main-header">☁️ Arquitetura Google Cloud da Demonstração</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Mapeamento de serviços utilizados no projeto `abiding-arch-505313-m3`</div>', unsafe_allow_html=True)
+elif "4. Conexões" in menu:
+    st.markdown('<div class="main-header">⚙️ Conexão com Gemini Enterprise & Gestão da Demo</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Configurações de integração entre o repositório de dados e a interface do <b>Gemini Enterprise</b>.</div>', unsafe_allow_html=True)
     
     st.markdown("""
-    ```mermaid
-    graph TD
-        A[👨‍⚕️ Prescrição Médica & Laudo PDF] -->|Upload| B[🗄️ Cloud Storage Bucket]
-        B -->|OCR & Parsing| C[✨ Vertex AI Gemini Multimodal]
-        C -->|Gravação Estruturada| D[📊 BigQuery Dataset: luminar_saude]
-        D -->|Consultas Analíticas| E[🤖 Vertex AI Agent Platform]
-        E -->|MCP Tool Calling| F[🚀 Cloud Run MCP Server]
-        F -->|Recomendações em Tempo Real| G[💻 Cockpit Comercial Streamlit]
-        E -->|Geração de E-mails & Docs| H[💼 Google Workspace Drive / Gmail]
-    ```
-    """)
+    <div class="card-container">
+        <h4 style="margin-top:0; color:#0369A1;">Como o Gemini Enterprise acessa estas fontes de dados:</h4>
+        <ol style="color:#1E293B; line-height:1.8;">
+            <li><b>Data Store (Cloud Storage):</b> O Gemini Enterprise utiliza o Data Store <code>luminar-saude-datastore</code> para indexar e realizar buscas semânticas nos PDFs de laudos médicos e manuais.</li>
+            <li><b>Tabelas BigQuery:</b> As 4 tabelas do dataset <code>luminar_saude</code> são consultadas via BigQuery Data Agent / Search & Conversation.</li>
+            <li><b>OpenAPI Tools (Cloud Run):</b> As operações dinâmicas (como cálculo de preço, matching de catálogo e disparo de proposta) são executadas chamando a API exposta pelo Cloud Run.</li>
+        </ol>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.subheader("🔄 Restauração da Base de Demonstração")
+    st.markdown("Caso queira reiniciar a apresentação do zero e voltar para o estado padrão com os 5 pacientes de referência:")
+    
+    if st.button("🔄 Executar Reset Geral da Base de Dados", use_container_width=False):
+        if reset_demo_data():
+            st.success("✅ Base de demonstração restaurada com sucesso para o estado padrão!")
+            st.rerun()

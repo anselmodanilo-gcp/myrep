@@ -1,76 +1,72 @@
-# 🎬 Roteiro Oficial de Apresentação da Demo — Luminar Saúde
-**Google Cloud & Workspace para Terapias Respiratórias e Medicina do Sono**
+# 🎬 Roteiro Oficial de Demonstração — Luminar Saúde com Gemini Enterprise
+**Google Cloud & Gemini Enterprise para Terapias Respiratórias e Medicina do Sono**
 
 ---
 
-## 🎯 Objetivo da Demonstração
-Demonstrar como a **Luminar Saúde** utiliza o **Google Cloud (Vertex AI, Gemini, BigQuery, Cloud Storage e Cloud Run)** e o **Google Workspace (Gmail e Drive)** para equipar seus consultores comerciais com um **Copiloto Inteligente**, acelerando o ciclo comercial de semanas para minutos, aumentando a taxa de conversão e a receita recorrente de insumos (LTV).
+## 🎯 Conceito Arquitetural da Demo
+
+1. **Gemini Enterprise (Ponto de Acesso Único do Usuário):**
+   - É a interface única onde o consultor comercial interage para consultar dados de pacientes no **BigQuery**, ler laudos e prescrições em PDF no **Cloud Storage** e acionar ferramentas do **MCP Server**.
+2. **Gerenciador da Demo no Cloud Run (Backstage & Control Plane):**
+   - Ambiente de controle para o apresentador injetar novos leads, gerar cenários ao vivo e resetar a base de dados.
 
 ---
 
-## 🧭 Estrutura da Apresentação em 5 Atos
+## 🧭 Estrutura da Apresentação em 5 Atos com Prompts do Gemini Enterprise
 
 ```
-[Ato 1: O Desafio] ➡️ [Ato 2: Cockpit & Laudos] ➡️ [Ato 3: Matching Clínico IA] ➡️ [Ato 4: Live Lead Simulator] ➡️ [Ato 5: Recorrência & LTV]
+[Ato 1: O Desafio & Fila de Leads] ➡️ [Ato 2: Leitura de PDF no Storage] ➡️ [Ato 3: Matching CPAP & Proposta] ➡️ [Ato 4: Injeção de Lead ao Vivo] ➡️ [Ato 5: Recorrência LTV]
 ```
 
 ---
 
-### 📍 ATO 1: O Desafio do Negócio (1 a 2 minutos)
-* **Narrativa do Apresentador:**
-  > "Na medicina respiratória e do sono, o vendedor não vende apenas um produto, ele vende uma terapia médica. Quando um paciente é diagnosticado com apneia obstrutiva do sono, o vendedor recebe laudos polissonográficos com termos complexos: IAH, saturação mínima, pressão titulada em cmH2O. Traduzir isso na máscara certa, no CPAP ideal e quebrar o medo de claustrofobia do paciente demorava dias. Com a plataforma de IA da Luminar Saúde, o consultor comercial tem um Copiloto em tempo real."
+### 📍 ATO 1: O Desafio Comercial & Consulta ao BigQuery (2 minutos)
+* **Onde interagir:** No **Gemini Enterprise**.
+* **Prompt para executar no Gemini Enterprise:**
+  > *"Quais são os pacientes com apneia do sono grave na nossa base do BigQuery que exigem contato imediato da equipe de vendas? Apresente o IAH, saturação mínima e médico prescritor de cada um."*
+* **Resultado:** O Gemini Enterprise consulta a tabela `luminar_saude.leads_pacientes` e lista os casos graves (como Roberto Silveira Santos, IAH 38.4).
 
 ---
 
-### 📍 ATO 2: Cockpit Comercial & Extração Multimodal de Laudos (3 minutos)
-* **Onde clicar na tela:** Menu Lateral 👉 **`1. Cockpit Comercial & Qualificação`**
-* **O que mostrar:**
-  1. Destaque os cartões de métricas superiores: **Taxa de prioridade alta (80%)**, **Ticket Médio com Cross-Sell** e **Ciclo Comercial reduzido em 55%**.
-  2. Selecione o paciente **Roberto Silveira Santos**.
-  3. Aponte o alerta vermelho: **Apneia Obstrutiva Grave (IAH 38.4 ev/h, SpO2 mínima de 74%)**.
-  4. Mostre a caixa à direita com o **extrato do Laudo Polissonográfico** extraído diretamente do PDF armazenado no Cloud Storage (`gs://abiding-arch-505313-m3-luminar-saude`).
-* **Mensagem de Impacto:**
-  > "O Gemini leu o laudo em PDF em milissegundos, estruturou os parâmetros no BigQuery e classificou a urgência médica imediatamente."
+### 📍 ATO 2: Extração Multimodal do Laudo em PDF no Cloud Storage (3 minutos)
+* **Onde interagir:** No **Gemini Enterprise**.
+* **Prompt para executar no Gemini Enterprise:**
+  > *"Abra o laudo polissonográfico do paciente Roberto Silveira Santos no Cloud Storage e resuma: qual foi a pressão titulada recomendada pelo Dr. Fernando Albuquerque e qual é o padrão respiratório dele?"*
+* **Resultado:** O Gemini lê o PDF no Storage e extrai: pressão de **12.0 cmH2O**, IAH **38.4 ev/h** e respiração **bucal/mista**.
 
 ---
 
-### 📍 ATO 3: Copiloto de Recomendação & Matching de Catálogo (3 minutos)
-* **Onde clicar na tela:** Menu Lateral 👉 **`2. Copiloto de Recomendação (CPAP/Máscaras)`**
-* **O que mostrar:**
-  1. Veja o pacote montado pela IA para o **Roberto Silveira Santos**:
-     - **Equipamento:** *ResMed AirSense 11 AutoSet* (com alívio expiratório EPR e conexão celular).
-     - **Máscara:** *ResMed AirFit F20 Full Face* (Tamanho G).
-     - **Insumos Cross-Sell:** *Tubo Térmico ClimateLineAir + Filtros Hipoalergênicos + CPAP Wipes*.
-  2. Leia o **Racional Clínico da IA**: *Como o paciente respira pela boca e a pressão é alta (12 cmH2O), a máscara facial é obrigatória para evitar vazamento de ar e ressecamento.*
-  3. Mostre a seção **Quebra de Objeções**: argumentos prontos para contornar o medo do paciente com o programa *Luminar Adaptação 30 Dias* (troca grátis de máscara).
-  4. Clique nos botões de ação rápida: **`📲 Disparar Proposta no WhatsApp`** e **`📧 Gerar E-mail Formal`**.
+### 📍 ATO 3: Matching de CPAP, Máscara e Quebra de Objeções (3 minutos)
+* **Onde interagir:** No **Gemini Enterprise**.
+* **Prompt para executar no Gemini Enterprise:**
+  > *"Com base no laudo e na respiração bucal do Roberto Silveira, qual modelo de CPAP e qual máscara do nosso catálogo devo ofertar? Gere também uma proposta comercial com quebra de objeções sobre adaptação para envio via WhatsApp."*
+* **Resultado:**
+  - **CPAP:** *ResMed AirSense 11 AutoSet*
+  - **Máscara:** *AirFit F20 Full Face* (obrigatória para quem respira pela boca e tem pressão de 12 cmH2O).
+  - **Cross-Sell:** Tubo aquecido *ClimateLineAir* para evitar ressecamento.
+  - **Quebra de Objeções:** Argumento sobre o programa *"Luminar Adaptação 30 Dias"* (troca grátis de modelo de máscara).
 
 ---
 
-### 📍 ATO 4: Criação de Lead em Tempo Real (Live Lead Simulator) (3 minutos)
-* **Onde clicar na tela:** Menu Lateral 👉 **`3. Gerador de Clientes em Tempo Real`**
-* **O que demonstrar ao vivo:**
-  1. Mostre os botões de **1-Clique**:
-     - Clique em **`🤧 Paciente Rinite & Claustrofobia`** ou **`✈️ Paciente Executivo Viagem`**.
-     - O sistema injetará instantaneamente o novo lead no BigQuery e atualizará a base!
-  2. Volte ao **Cockpit** e mostre que a paciente **Juliana Silveira** (com rinite e claustrofobia) já foi qualificada, e a IA recomendou a **Máscara AirFit P10 (de apenas 45g)** e **Filtros Antialérgicos**.
-* **Mensagem de Impacto:**
-  > "Isso demonstra a reatividade em tempo real da arquitetura: qualquer nova receita recebida via formulário, WhatsApp ou integração de clínicas médicas é qualificada instantaneamente."
+### 📍 ATO 4: Injeção de Novo Lead em Tempo Real (3 minutos)
+* **Passo 1 (No Gerenciador Cloud Run):**
+  - Acesse o menu **`2. Gerador de Dados Sintéticos`** e clique em **`🚀 Injetar Paciente 3: Juliana Silveira (Rinite & Claustrofobia)`**.
+* **Passo 2 (No Gemini Enterprise):**
+  - Execute o prompt:
+  > *"A paciente Juliana Silveira acabou de ser cadastrada. Ela tem rinite alérgica crônica e queixa de claustrofobia com máscaras faciais grandes. O que você recomenda para o caso dela?"*
+* **Resultado:** A IA recomenda imediatamente a **Máscara AirFit P10 (Almofadas Nasais de apenas 45g)** e **Filtros Hipoalergênicos**.
 
 ---
 
-### 📍 ATO 5: Agent Platform, MCP Tools & Workspace Integrado (3 minutos)
-* **Onde clicar na tela:** Menu Lateral 👉 **`4. Agent Platform & MCP Playground`** e **`5. Simulador Workspace`**
-* **O que demonstrar:**
-  1. No **Agent Playground**, faça uma pergunta interativa ou selecione:
-     - *"O paciente Carlos Eduardo tem pressão de 15 cmH2O e queixa de cansaço. Devo indicar CPAP ou BiPAP?"*
-     - Mostre o Agent chamando a Tool MCP `consultar_paciente` e explicando clinicamente por que o **BiPAP AirCurve 10** é indispensável para proteger a saúde cardiovascular do paciente.
-  2. No **Simulador Workspace**, mostre o e-mail de encaminhamento do Pneumologista no Gmail, a proposta personalizada enviada ao paciente e o acompanhamento de telemetria após 7 dias de uso.
-  3. Finalize na aba **`6. Recorrência & LTV`**, mostrando como o sistema gera receita recorrente identificando almofadas de silicone com mais de 6 meses de uso.
+### 📍 ATO 5: Gestão de Recorrência e LTV de Insumos (2 minutos)
+* **Onde interagir:** No **Gemini Enterprise**.
+* **Prompt para executar no Gemini Enterprise:**
+  > *"Consulte o histórico de compras no BigQuery e liste quais clientes estão usando a mesma almofada de máscara há mais de 180 dias. Redija um lembrete empático de saúde para enviar aos pacientes elegíveis para troca."*
+* **Resultado:** Identifica pacientes que precisam de substituição de insumos e gera mensagem focada em vedação, higiene e qualidade do sono.
 
 ---
 
-## 🏆 Resumo do Valor de Negócio (Fechamento)
-1. **+35% de Conversão Comercial**: O vendedor fala com a linguagem do médico e quebra o medo do paciente com autoridade.
-2. **Zero Erro de Compatibilidade**: Máscaras, traqueias e pressões sempre 100% corretas para a prescrição.
-3. **+22% de Receita Recorrente (LTV)**: Automação da reposição periódica de filtros e almofadas.
+## 🏆 Resumo do Valor de Negócio
+1. **Ponto Único de Acesso:** Toda a inteligência e consultas unificadas no **Gemini Enterprise**.
+2. **Dados Estruturados + Não Estruturados:** BigQuery e PDFs no Cloud Storage trabalhando juntos.
+3. **Produtividade Comercial:** Ciclo de vendas reduzido de semanas para minutos com zero erro de compatibilidade.
