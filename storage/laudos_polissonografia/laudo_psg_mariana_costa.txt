@@ -1,0 +1,8 @@
+=== LAUDO POLISSONOGRAFIA LUMINAR SAÚDE ===
+Paciente: Mariana Costa Andrade
+Idade: 41 | Genero: F
+Médico Prescritor: Dra. Beatriz Mendes (CRM-SP 178.432)
+Diagnóstico: G47.3 - Apneia Obstrutiva do Sono Moderada
+IAH: 21.2 ev/h | SpO2 Mínima: 84.0% | Pressão Titulada: 8.5 cmH2O
+Padrão: Nasal | Comorbidades: Rinite Alérgica Crônica, Insônia Inicial
+Prescrição: CPAP Automático com alívio expiratório (AutoSet / EPR) ou BiPAP em caso de alta resistência. + Máscara Nasal compacta ou Almofadas Nasais.

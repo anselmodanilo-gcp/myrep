@@ -1,0 +1,3 @@
+historico_id,paciente_id,nome_paciente,produto_sku,data_compra,data_ultima_troca_mascara,data_ultima_troca_filtro,dias_desde_troca_mascara,alerta_reposicao,valor_recorrente_estimado_brl
+HIST-501,PAC-892,Julio Cesar Brandão,CPAP-RES-AS10,2024-06-15,2025-11-10,2026-05-15,288,URGENTE: Almofada de silicone com mais de 6 meses (risco de microvazamento),840.0
+HIST-502,PAC-914,Regina Silveira Camargo,CPAP-RES-AS11,2025-02-20,2026-02-10,2026-06-01,196,RECOMENDADA: Troca de filtros hipoalergênicos e revisão da almofada N20,450.0

@@ -1,0 +1,8 @@
+=== LAUDO POLISSONOGRAFIA LUMINAR SAÚDE ===
+Paciente: Luiz Gustavo Moreira
+Idade: 48 | Genero: M
+Médico Prescritor: Dr. Fernando Albuquerque (CRM-SP 142.890)
+Diagnóstico: G47.3 - Apneia Obstrutiva Grave Posicional
+IAH: 32.1 ev/h | SpO2 Mínima: 79.0% | Pressão Titulada: 10.5 cmH2O
+Padrão: Nasal | Comorbidades: Diabetes Tipo 2, Refluxo Gastroesofágico
+Prescrição: CPAP Automático com alívio expiratório (AutoSet / EPR) ou BiPAP em caso de alta resistência. + Máscara Nasal compacta ou Almofadas Nasais.

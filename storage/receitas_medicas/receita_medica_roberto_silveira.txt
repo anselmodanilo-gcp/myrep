@@ -1,0 +1,29 @@
+CLÍNICA SUL DE MEDICINA RESPIRATÓRIA E DO SONO
+Dr. Fernando Albuquerque - CRM-SP 142.890 | RQE 78.901
+Pneumologia e Medicina do Sono
+
+RECEITUÁRIO MÉDICO ESPECIALIZADO
+
+Paciente: Roberto Silveira Santos
+Data: 20/08/2026
+
+PRESCRIÇÃO TERAPÊUTICA:
+
+1. Pressão Positiva Contínua em Vias Aéreas (CPAP) com ajuste automático de pressão (AutoSet / Auto-CPAP).
+   - Pressão Mínima: 8.0 cmH2O
+   - Pressão Máxima: 16.0 cmH2O
+   - Pressão Titulada em Laboratório: 12.0 cmH2O
+   - Alívio de Pressão Expiratório (EPR / SensAwake): Nível 3 (Máximo conforto).
+   - Modo de Rampa: Automático (início com 4.0 cmH2O durante 20 min).
+
+2. Interface Respiratória (Máscara):
+   - Modelo Facial / Oronasal (devido à respiração predominantemente bucal e queixas de escape de ar). Sugestão: ResMed AirFit F20 (Tamanho G).
+
+3. Umidificação Ativa com Tubo Aquecido:
+   - Nível de umidificação 4 com controle térmico (ClimateLine) para prevenção de rinite e ressecamento de via aérea superior.
+
+4. Telemonitoramento:
+   - Conectar o equipamento ao sistema de acompanhamento remoto AirView e liberar acesso ao médico assistente.
+
+Dr. Fernando Albuquerque
+Assinatura Digital ICP-Brasil: 7f8a9e01-23bc-45de-67f8-9a0b1c2d3e4f

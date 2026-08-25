@@ -1,0 +1,8 @@
+=== LAUDO POLISSONOGRAFIA LUMINAR SAÚDE ===
+Paciente: Carlos Eduardo Paes
+Idade: 63 | Genero: M
+Médico Prescritor: Dr. Henrique Vasconcellos (CRM-RJ 98.765)
+Diagnóstico: G47.3 - Apneia Mista com Hipoxemia Noturna
+IAH: 46.0 ev/h | SpO2 Mínima: 68.0% | Pressão Titulada: 15.0 cmH2O
+Padrão: Oral | Comorbidades: Insuficiência Cardíaca Leve, Fibrilação Atrial
+Prescrição: CPAP Automático com alívio expiratório (AutoSet / EPR) ou BiPAP em caso de alta resistência. + Máscara Facial / Oronasal (devido à respiração oral/mista e pressão elevada).

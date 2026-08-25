@@ -1,0 +1,20 @@
+ESPECIFICAÇÕES TÉCNICAS - RESMED AIRSENSE 11 AUTOSET
+Categoria: CPAP Automático Premium
+Fabricante: ResMed Ltd.
+
+1. Recursos Principais:
+- Algoritmo AutoSet e AutoSet for Her para titulação dinâmica respiração a respiração.
+- Conectividade Celular 4G integrada com envio diário de dados ao ecossistema AirView.
+- Assistente de Cuidado Pessoal (Care Check-In) com orientações interativas na tela touchscreen.
+- Tecnologia EPR (Expiratory Pressure Relief) para redução suave da pressão na expiração.
+- Umidificador HumidAir integrado com controle climático automático (Climate Control Auto).
+
+2. Dimensões e Ruído:
+- Peso: 1.130 g com câmara de água vazia.
+- Dimensões: 94.5 mm x 259.4 mm x 138.5 mm.
+- Nível de Ruído: 25 dBA (praticamente inaudível no quarto de dormir).
+
+3. Compatibilidade de Acessórios:
+- Tubos: SlimLine (15 mm), Padrão (22 mm), ClimateLineAir 11 (aquecido).
+- Filtros: Padrão e Hipoalergênicos.
+- Alimentação: Fonte bivolt automática 100-240V, 50-60Hz (consumo típico 56W).

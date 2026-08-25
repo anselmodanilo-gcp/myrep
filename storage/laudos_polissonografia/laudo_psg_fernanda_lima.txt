@@ -1,0 +1,8 @@
+=== LAUDO POLISSONOGRAFIA LUMINAR SAÚDE ===
+Paciente: Fernanda Lima de Oliveira
+Idade: 36 | Genero: F
+Médico Prescritor: Dra. Camila Nogueira (CRM-MG 65.432)
+Diagnóstico: G47.3 - Apneia Leve com Sintomas Diurnos
+IAH: 9.8 ev/h | SpO2 Mínima: 90.0% | Pressão Titulada: 6.0 cmH2O
+Padrão: Nasal | Comorbidades: Sonolência Diurna Excessiva (Epworth 14), Bruxismo
+Prescrição: CPAP Automático com alívio expiratório (AutoSet / EPR) ou BiPAP em caso de alta resistência. + Máscara Nasal compacta ou Almofadas Nasais.

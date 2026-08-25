@@ -1,0 +1,8 @@
+=== LAUDO POLISSONOGRAFIA LUMINAR SAÚDE ===
+Paciente: Roberto Silveira Santos
+Idade: 52 | Genero: M
+Médico Prescritor: Dr. Fernando Albuquerque (CRM-SP 142.890)
+Diagnóstico: G47.3 - Apneia Obstrutiva do Sono Grave
+IAH: 38.4 ev/h | SpO2 Mínima: 74.0% | Pressão Titulada: 12.0 cmH2O
+Padrão: Oral / Mista | Comorbidades: Hipertensão Arterial, Obesidade Grau 1
+Prescrição: CPAP Automático com alívio expiratório (AutoSet / EPR) ou BiPAP em caso de alta resistência. + Máscara Facial / Oronasal (devido à respiração oral/mista e pressão elevada).
