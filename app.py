@@ -147,8 +147,9 @@ menu = st.sidebar.radio(
     [
         "🧭 1. Roteiro da Demo & Prompts do Gemini Enterprise",
         "🪄 2. Gerador de Dados Sintéticos & Injeção ao Vivo",
-        "📊 3. Inspeção de Fontes de Dados (BigQuery & Storage)",
-        "⚙️ 4. Conexões do Gemini Enterprise & Reset da Base"
+        "🤖 3. Agente de Qualificação (Memory Bank & Sessions)",
+        "📊 4. Inspeção de Fontes de Dados (BigQuery & Storage)",
+        "⚙️ 5. Conexões do Gemini Enterprise & Reset da Base"
     ]
 )
 
@@ -595,9 +596,119 @@ elif "2. Gerador" in menu:
                 st.rerun()
 
 # ==============================================================================
-# MENU 3: INSPEÇÃO DE FONTES DE DADOS (BIGQUERY & STORAGE)
+# MENU 3: AGENTE DE QUALIFICAÇÃO (MEMORY BANK & SESSIONS)
 # ==============================================================================
-elif "3. Inspeção" in menu:
+elif "3. Agente" in menu:
+    st.markdown('<div class="main-header">🤖 Agente Autônomo de Qualificação no Agent Platform</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Acione o agente inteligente para processar laudos médicos, calcular combos clínicos e gerenciar o <b>Memory Bank</b> e <b>Sessions</b>.</div>', unsafe_allow_html=True)
+    
+    tab_exec_agent, tab_memory, tab_registry = st.tabs([
+        "⚡ Acionar Qualificação do Agente",
+        "🧠 Memory Bank & Histórico do Paciente",
+        "📋 Agent Registry & Sessões Ativas"
+    ])
+    
+    from qualification_agent import LeadQualificationAgent
+    
+    if "agent_instance" not in st.session_state:
+        st.session_state.agent_instance = LeadQualificationAgent()
+        st.session_state.agent_instance.set_up()
+        
+    qual_agent = st.session_state.agent_instance
+    
+    with tab_exec_agent:
+        st.subheader("⚡ Disparo da Qualificação Autônoma")
+        
+        c_sel_lead, c_sel_context = st.columns([1, 1.5])
+        with c_sel_lead:
+            selected_lead_id = st.selectbox(
+                "Selecione o Lead / Paciente:",
+                df_leads['lead_id'].tolist() if not df_leads.empty else ["LEAD-1001"],
+                format_func=lambda x: f"{x} - {df_leads[df_leads['lead_id']==x].iloc[0]['nome_paciente']}" if not df_leads.empty and not df_leads[df_leads['lead_id']==x].empty else x
+            )
+        with c_sel_context:
+            contexto_extra = st.text_input(
+                "Notas adicionais para o Memory Bank (Opcional):",
+                "Paciente refere claustrofobia com máscaras faciais e receio de ruído noturno."
+            )
+            
+        if st.button("🚀 Acionar Qualificação com o Agente", use_container_width=True):
+            with st.spinner("Agente executando matching clínico, consultando Memory Bank e calculando score..."):
+                resultado = qual_agent.qualify_lead(selected_lead_id, context_notes=contexto_extra)
+                
+                if resultado.get("status") == "success":
+                    st.success(f"🎉 Qualificação concluída com sucesso! (Sessão ID: `{resultado['session_id']}`)")
+                    
+                    q_col1, q_col2 = st.columns(2)
+                    with q_col1:
+                        st.markdown(f"""
+                        <div class="card-container">
+                            <h4 style="margin:0 0 10px 0; color:#0369A1;">🫁 Diagnóstico & Score do Paciente</h4>
+                            <b>Nome:</b> {resultado['paciente']['nome']} ({resultado['paciente']['idade']} anos)<br/>
+                            <b>Diagnóstico:</b> {resultado['paciente']['diagnostico_cid']}<br/>
+                            <b>IAH:</b> {resultado['paciente']['iah']} ev/h | <b>Pressão:</b> {resultado['paciente']['pressao_titulada_cmh2o']} cmH2O<br/>
+                            <b>Respiração:</b> {resultado['paciente']['respiracao_predominante']}<br/>
+                            <hr style="margin:10px 0;"/>
+                            <b>Score Prioridade:</b> <span style="font-size:18px; font-weight:bold; color:#16A34A;">{resultado['qualificacao_ia']['score_prioridade']}/100</span><br/>
+                            <b>Urgência Comercial:</b> <code>{resultado['qualificacao_ia']['urgencia_comercial']}</code> (SLA: {resultado['qualificacao_ia']['sla_atendimento_horas']}h)
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                    with q_col2:
+                        st.markdown(f"""
+                        <div class="card-container">
+                            <h4 style="margin:0 0 10px 0; color:#0369A1;">💡 Recomendação Clínica de Produtos</h4>
+                            <b>Equipamento:</b> {resultado['recomendacao_produtos']['equipamento_recomendado']}<br/>
+                            <b>Máscara:</b> {resultado['recomendacao_produtos']['mascara_recomendada']}<br/>
+                            <b>Insumos Cross-Sell:</b> {resultado['recomendacao_produtos']['insumos_cross_sell']}<br/>
+                            <hr style="margin:10px 0;"/>
+                            <b>Valor Total:</b> R$ {resultado['recomendacao_produtos']['valor_total_pacote']:,.2f}<br/>
+                            <b>Condição Comercial:</b> {resultado['recomendacao_produtos']['condicao_sugerida']}
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                    st.markdown("#### 📲 Proposta Comercial Formatada para Envio:")
+                    st.code(resultado['proposta_comercial']['pitch_whatsapp'], language="text")
+                    
+    with tab_memory:
+        st.subheader("🧠 Snapshot do Memory Bank do Paciente")
+        st.markdown("O Memory Bank preserva o contexto de longo prazo, sensibilidades, restrições e notas de interações:")
+        
+        mem_lead_id = st.selectbox(
+            "Ver memória do paciente:",
+            df_leads['lead_id'].tolist() if not df_leads.empty else ["LEAD-1001"],
+            key="sb_mem"
+        )
+        mem_data = qual_agent.memory_bank.get_memory(mem_lead_id)
+        st.json(mem_data)
+        
+    with tab_registry:
+        st.subheader("📋 Registro do Agente no Vertex AI Agent Registry")
+        st.markdown("""
+        ```json
+        {
+          "agent_name": "Luminar Saúde - Agente Autônomo de Qualificação de Leads",
+          "platform": "Vertex AI Agent Platform & Reasoning Engine",
+          "runtime": "Python 3.11 / Vertex AI SDK",
+          "model": "gemini-1.5-flash",
+          "features": [
+            "Memory Bank (Memória Semântica de Preferências e Restrições)",
+            "Session Management (Controle de Sessões Multiturno)",
+            "Autonomous Lead Qualification & Product Matching",
+            "Agent Registry & OpenAPI 3.0 Tools"
+          ],
+          "entrypoints": {
+            "qualify_lead": "Execução autônoma end-to-end de qualificação clínica",
+            "query": "Conversação multiturno com sessão persistente"
+          }
+        }
+        ```
+        """)
+
+# ==============================================================================
+# MENU 4: INSPEÇÃO DE FONTES DE DADOS (BIGQUERY & STORAGE)
+# ==============================================================================
+elif "4. Inspeção" in menu:
     st.markdown('<div class="main-header">📊 Inspeção de Fontes de Dados (Data Source Hub)</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Confira o catálogo de dados estruturados e não estruturados que alimentam as respostas do <b>Gemini Enterprise</b>.</div>', unsafe_allow_html=True)
     
@@ -649,9 +760,9 @@ elif "3. Inspeção" in menu:
         st.markdown(f"**OpenAPI 3.0 Spec:** `/openapi.json` | **MCP Manifest:** `/mcp/manifest.json`")
 
 # ==============================================================================
-# MENU 4: CONEXÕES DO GEMINI ENTERPRISE & RESET DA BASE
+# MENU 5: CONEXÕES DO GEMINI ENTERPRISE & RESET DA BASE
 # ==============================================================================
-elif "4. Conexões" in menu:
+elif "5. Conexões" in menu:
     st.markdown('<div class="main-header">⚙️ Conexão com Gemini Enterprise & Gestão da Demo</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Configurações de integração entre o repositório de dados e a interface do <b>Gemini Enterprise</b>.</div>', unsafe_allow_html=True)
     

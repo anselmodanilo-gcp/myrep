@@ -268,6 +268,34 @@ def criar_novo_lead(req: NovoLeadRequest):
     }
 
 # -------------------------------------------------------------
+# Tool 5: Agente Autônomo de Qualificação (Agent Platform)
+# -------------------------------------------------------------
+from qualification_agent import LeadQualificationAgent
+global_qualification_agent = LeadQualificationAgent()
+
+class QualificacaoAgentRequest(BaseModel):
+    lead_id: str = Field(..., example="LEAD-1001")
+    notas_contexto: Optional[str] = Field("", example="Paciente tem receio de barulho durante a noite")
+    session_id: Optional[str] = Field(None, example="sess-12345")
+
+@app.post("/tools/qualificar_lead_agent", summary="Aciona o Agente Autônomo de Qualificação com Memory Bank e Sessions")
+def qualificar_lead_agent(req: QualificacaoAgentRequest):
+    """
+    Aciona o fluxo autônomo do LeadQualificationAgent:
+    - Recupera dados clínicos e laudos
+    - Consulta e atualiza o Memory Bank do paciente
+    - Faz o matching com o catálogo
+    - Calcula o score de prioridade e SLA
+    - Gera a proposta comercial e scripts de quebra de objeções
+    """
+    res = global_qualification_agent.qualify_lead(
+        lead_id=req.lead_id,
+        context_notes=req.notas_contexto or "",
+        session_id=req.session_id
+    )
+    return res
+
+# -------------------------------------------------------------
 # Manifest & Health Check
 # -------------------------------------------------------------
 @app.get("/healthz")
@@ -283,6 +311,11 @@ def mcp_manifest():
         "description_for_model": "Ferramentas para consultar diagnósticos de apneia do sono, laudos polissonográficos, recomendar catálogos de CPAP/BiPAP/Máscaras e gerar pitches de vendas para a Luminar Saúde.",
         "description_for_human": "Assistente inteligente para vendedores da Luminar Saúde qualificarem leads e venderem CPAPs.",
         "tools": [
+            {
+                "name": "qualificar_lead_agent",
+                "description": "Aciona o Agente Autônomo de Qualificação com Memory Bank e Sessions.",
+                "endpoint": "/tools/qualificar_lead_agent"
+            },
             {
                 "name": "consultar_paciente",
                 "description": "Busca laudo de sono, IAH, saturação de O2 e pressão de titulação de um paciente.",

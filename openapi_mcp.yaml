@@ -9,6 +9,37 @@ servers:
   - url: http://localhost:8000
     description: Local Development
 paths:
+  /tools/qualificar_lead_agent:
+    post:
+      summary: Acionar o Agente Autônomo de Qualificação com Memory Bank e Sessions
+      description: Executa o fluxo autônomo de matching clínico, análise de IAH/pressão, consulta ao Memory Bank e geração de proposta com quebra de objeções.
+      operationId: qualificarLeadAgent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - lead_id
+              properties:
+                lead_id:
+                  type: string
+                  example: LEAD-1001
+                notas_contexto:
+                  type: string
+                  example: Paciente tem receio de barulho durante a noite
+                session_id:
+                  type: string
+                  example: sess-12345
+      responses:
+        '200':
+          description: Qualificação autônoma gerada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+
   /tools/consultar_paciente:
     get:
       summary: Consultar dados clínicos e laudo polissonográfico do paciente

@@ -83,9 +83,10 @@ gcloud run deploy ${SERVICE_NAME} \
 
 SERVICE_URL=$(gcloud run services describe ${SERVICE_NAME} --platform managed --region ${REGION} --format 'value(status.url)')
 
-# 7. Configuração do Vertex AI Agent Builder & Data Store
-echo -e "\n[7/7] Configurando Vertex AI Agent Platform & Data Store..."
+# 7. Configuração do Vertex AI Agent Builder & Agent Platform
+echo -e "\n[7/7] Configurando Vertex AI Agent Platform, Memory Bank & Agent Registry..."
 python3 deploy_agent_platform.py --project ${PROJECT_ID} --region ${REGION} --service-url ${SERVICE_URL} || true
+python3 deploy_agent_engine.py --project ${PROJECT_ID} --location ${REGION} || true
 
 echo -e "\n========================================================================="
 echo "  🎉 DEPLOY COMPLETO REALIZADO COM SUCESSO!"
