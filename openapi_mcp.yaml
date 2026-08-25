@@ -1,0 +1,152 @@
+openapi: 3.0.3
+info:
+  title: Luminar Saude MCP Tool Server
+  description: Ferramentas MCP para o Copiloto Comercial da Luminar Saúde no Vertex AI Agent Platform
+  version: 1.0.0
+servers:
+  - url: https://luminar-saude-demo-431262818879.southamerica-east1.run.app
+    description: Cloud Run Production Endpoint
+  - url: http://localhost:8000
+    description: Local Development
+paths:
+  /tools/consultar_paciente:
+    get:
+      summary: Consultar dados clínicos e laudo polissonográfico do paciente
+      description: Retorna IAH, SpO2, pressão titulada em cmH2O, diagnóstico CID e histórico médico.
+      operationId: consultarPaciente
+      parameters:
+        - name: lead_id
+          in: query
+          required: true
+          description: ID do lead (ex LEAD-1001) ou nome do paciente
+          schema:
+            type: string
+            example: LEAD-1001
+      responses:
+        '200':
+          description: Ficha clínica recuperada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lead_id:
+                    type: string
+                  nome_paciente:
+                    type: string
+                  diagnostico:
+                    type: string
+                  iah:
+                    type: number
+                  gravidade_apneia:
+                    type: string
+                  pressao_titulada_cmh2o:
+                    type: number
+                  respiracao_predominante:
+                    type: string
+
+  /tools/recomendar_produtos:
+    get:
+      summary: Recomendar pacote de CPAP, máscara e insumos
+      description: Matching clínico entre prescrição médica e catálogo da Luminar Saúde.
+      operationId: recomendarProdutos
+      parameters:
+        - name: lead_id
+          in: query
+          required: true
+          description: ID do lead para cálculo do pacote
+          schema:
+            type: string
+            example: LEAD-1001
+      responses:
+        '200':
+          description: Recomendação gerada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  equipamento_recomendado:
+                    type: string
+                  mascara_recomendada:
+                    type: string
+                  insumos_cross_sell:
+                    type: string
+                  valor_total_brl:
+                    type: number
+                  condicao_comercial:
+                    type: string
+                  argumentacao_vendas:
+                    type: string
+
+  /tools/gerar_pitch_vendas:
+    get:
+      summary: Gerar texto de abordagem e proposta para WhatsApp ou Gmail
+      description: Redige pitch empático com quebra de objeções personalizado para o paciente.
+      operationId: gerarPitchVendas
+      parameters:
+        - name: lead_id
+          in: query
+          required: true
+          schema:
+            type: string
+            example: LEAD-1001
+        - name: canal
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [whatsapp, email]
+            default: whatsapp
+      responses:
+        '200':
+          description: Texto gerado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensagem_gerada:
+                    type: string
+
+  /tools/criar_novo_lead:
+    post:
+      summary: Criar novo lead / paciente simulado em tempo real
+      description: Insere paciente na base e dispara qualificação imediata.
+      operationId: criarNovoLead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nome_paciente
+                - iah
+                - pressao_titulada_cmh2o
+                - respiracao_predominante
+              properties:
+                nome_paciente:
+                  type: string
+                  example: Ana Paula Valente
+                idade:
+                  type: integer
+                  example: 45
+                iah:
+                  type: number
+                  example: 34.5
+                spo2_minima:
+                  type: number
+                  example: 76.0
+                pressao_titulada_cmh2o:
+                  type: number
+                  example: 11.5
+                respiracao_predominante:
+                  type: string
+                  example: Oral / Mista
+                convenio:
+                  type: string
+                  example: Bradesco Saúde
+      responses:
+        '200':
+          description: Lead criado com sucesso
