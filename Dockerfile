@@ -8,6 +8,7 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
+    nginx \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -15,7 +16,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 8080 8000
+# Copia a configuração do Nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 8080
 
 RUN chmod +x entrypoint.sh
 
