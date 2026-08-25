@@ -36,8 +36,14 @@ gcloud services enable \
     discoveryengine.googleapis.com
 
 # 3. Gerar Assets Locais
-echo -e "\n[3/7] Gerando laudos médicos em PDF, CSVs e playbooks..."
-source venv/bin/activate 2>/dev/null || source .venv/bin/activate 2>/dev/null || true
+echo -e "\n[3/7] Preparando ambiente Python e gerando laudos médicos..."
+if [ ! -d ".venv" ] && [ ! -d "venv" ]; then
+    echo " -> Criando ambiente virtual Python (.venv) e instalando dependências..."
+    python3 -m venv .venv
+    .venv/bin/pip install --quiet --upgrade pip
+    .venv/bin/pip install --quiet -r requirements.txt
+fi
+source .venv/bin/activate 2>/dev/null || source venv/bin/activate 2>/dev/null || true
 python3 generate_assets.py
 python3 generate_extra_docs.py
 

@@ -12,10 +12,15 @@ Generates:
 import os
 import csv
 import json
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
+try:
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    HAS_REPORTLAB = True
+except ImportError:
+    HAS_REPORTLAB = False
 
 PROJECT_ID = "abiding-arch-505313-m3"
 DATASET_ID = "luminar_saude"
@@ -681,6 +686,9 @@ print("[OK] SQL Queries gerado.")
 # -------------------------------------------------------------
 
 def build_pdf_report(filename, title, subtitle, doctor_info, patient_dict, clinical_summary, conclusions):
+    if not HAS_REPORTLAB:
+        print(f"[SKIP] PDF '{os.path.basename(filename)}' ignorado (reportlab não instalado).")
+        return
     doc = SimpleDocTemplate(
         filename,
         pagesize=letter,
